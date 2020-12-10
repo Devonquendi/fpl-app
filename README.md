@@ -72,28 +72,28 @@ players = pd.json_normalize(
 )
 ```
 
-|:key: id|name|short_name|strength|strength_overall_home|strength_overall_away|strength_attack_home|strength_attack_away|strength_defence_home|strength_defence_away|
+| :key: id | name | short_name | strength | strength_overall_home | strength_overall_away | strength_attack_home | strength_attack_away | strength_defence_home | strength_defence_away |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-|1|Arsenal|ARS|4|1190|1210|1170|1210|1190|1200|
-|2|AstonVilla|AVL|3|1150|1160|1150|1150|1180|1210|
-|3|Brighton|BHA|3|1080|1100|1150|1180|1090|1100|
-|4|Burnley|BUR|2|1050|1080|1120|1190|1010|1030|
-|5|Chelsea|CHE|4|1260|1280|1240|1280|1270|1310|
-|6|CrystalPalace|CRY|3|1110|1150|1100|1150|1020|1050|
-|7|Everton|EVE|3|1180|1210|1150|1170|1210|1250|
-|8|Fulham|FUL|2|1000|1020|1020|1030|1020|1020|
-|9|Leicester|LEI|4|1220|1240|1190|1190|1200|1180|
-|10|Leeds|LEE|3|1100|1130|1060|1110|1130|1160|
-|11|Liverpool|LIV|5|1320|1360|1240|1320|1330|1350|
-|12|ManCity|MCI|5|1310|1360|1260|1320|1330|1350|
-|13|ManUtd|MUN|4|1230|1230|1220|1230|1250|1260|
-|14|Newcastle|NEW|3|1100|1130|1100|1120|1010|1060|
-|15|SheffieldUtd|SHU|3|1070|1100|1110|1130|1010|1050|
-|16|Southampton|SOU|3|1150|1180|1140|1200|1110|1160|
-|17|Spurs|TOT|4|1270|1280|1190|1240|1280|1320|
-|18|WestBrom|WBA|2|1010|1030|1020|1020|1000|1010|
-|19|WestHam|WHU|3|1140|1170|1150|1160|1170|1180|
-|20|Wolves|WOL|3|1160|1190|1180|1220|1100|1170|
+| 1 | Arsenal | ARS | 4 | 1190 | 1210 | 1170 | 1210 | 1190 | 1200 |
+| 2 | AstonVilla | AVL | 3 | 1150 | 1160 | 1150 | 1150 | 1180 | 1210 |
+| 3 | Brighton | BHA | 3 | 1080 | 1100 | 1150 | 1180 | 1090 | 1100 |
+| 4 | Burnley | BUR | 2 | 1050 | 1080 | 1120 | 1190 | 1010 | 1030 |
+| 5 | Chelsea | CHE | 4 | 1260 | 1280 | 1240 | 1280 | 1270 | 1310 |
+| 6 | CrystalPalace | CRY | 3 | 1110 | 1150 | 1100 | 1150 | 1020 | 1050 |
+| 7 | Everton | EVE | 3 | 1180 | 1210 | 1150 | 1170 | 1210 | 1250 |
+| 8 | Fulham | FUL | 2 | 1000 | 1020 | 1020 | 1030 | 1020 | 1020 |
+| 9 | Leicester | LEI | 4 | 1220 | 1240 | 1190 | 1190 | 1200 | 1180 |
+| 10 | Leeds | LEE | 3 | 1100 | 1130 | 1060 | 1110 | 1130 | 1160 |
+| 11 | Liverpool | LIV | 5 | 1320 | 1360 | 1240 | 1320 | 1330 | 1350 |
+| 12 | ManCity | MCI | 5 | 1310 | 1360 | 1260 | 1320 | 1330 | 1350 |
+| 13 | ManUtd | MUN | 4 | 1230 | 1230 | 1220 | 1230 | 1250 | 1260 |
+| 14 | Newcastle | NEW | 3 | 1100 | 1130 | 1100 | 1120 | 1010 | 1060 |
+| 15 | SheffieldUtd | SHU | 3 | 1070 | 1100 | 1110 | 1130 | 1010 | 1050 |
+| 16 | Southampton | SOU | 3 | 1150 | 1180 | 1140 | 1200 | 1110 | 1160 |
+| 17 | Spurs | TOT | 4 | 1270 | 1280 | 1190 | 1240 | 1280 | 1320 |
+| 18 | WestBrom | WBA | 2 | 1010 | 1030 | 1020 | 1020 | 1000 | 1010 |
+| 19 | WestHam | WHU | 3 | 1140 | 1170 | 1150 | 1160 | 1170 | 1180 |
+| 20 | Wolves | WOL | 3 | 1160 | 1190 | 1180 | 1220 | 1100 | 1170 |
 
 ### Gameweek history
 Individual player gameweek history can be retrieved from `https://fantasy.premierleague.com/api/element-summary/{player-id}/`
