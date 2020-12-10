@@ -35,7 +35,7 @@ players = pd.json_normalize(
 )
 ```
 
-|id|first_name|second_name|web_name|element_type|team|total_points|dreamteam_count|in_dreamteam|now_cost|points_per_game|minutes|goals_scored|assists|clean_sheets|goals_conceded|own_goals|penalties_saved|penalties_missed|yellow_cards|red_cards|saves|bonus|bps|influence|creativity|threat|ict_index|influence_rank|influence_rank_type|creativity_rank|creativity_rank_type|threat_rank|threat_rank_type|ict_index_rank|ict_index_rank_type|
+|:key: id|first_name|second_name|web_name|element_type|team|total_points|dreamteam_count|in_dreamteam|now_cost|points_per_game|minutes|goals_scored|assists|clean_sheets|goals_conceded|own_goals|penalties_saved|penalties_missed|yellow_cards|red_cards|saves|bonus|bps|influence|creativity|threat|ict_index|influence_rank|influence_rank_type|creativity_rank|creativity_rank_type|threat_rank|threat_rank_type|ict_index_rank|ict_index_rank_type|
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 |1|Mesut|Özil|Özil|3|1|0|0|False|68|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|604|240|604|240|604|240|604|240|
 |2|Sokratis|Papastathopoulos|Sokratis|2|1|0|0|False|49|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|566|212|556|212|543|206|567|212|
@@ -72,7 +72,7 @@ players = pd.json_normalize(
 )
 ```
 
-| :key: id | name | short_name | strength | strength_overall_home | strength_overall_away | strength_attack_home | strength_attack_away | strength_defence_home | strength_defence_away |
+| id | name | short_name | strength | strength_overall_home | strength_overall_away | strength_attack_home | strength_attack_away | strength_defence_home | strength_defence_away |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | Arsenal | ARS | 4 | 1190 | 1210 | 1170 | 1210 | 1190 | 1200 |
 | 2 | AstonVilla | AVL | 3 | 1150 | 1160 | 1150 | 1150 | 1180 | 1210 |
