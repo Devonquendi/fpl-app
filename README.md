@@ -35,8 +35,8 @@ players = pd.json_normalize(
 )
 ```
 
-|id|first_name|second_name|web_name|element_type|team|total_points|dreamteam_count|in_dreamteam|now_cost|points_per_game|minutes|goals_scored|assists|clean_sheets|goals_conceded|own_goals|penalties_saved|penalties_missed|yellow_cards|red_cards|saves|bonus|bps|influence|creativity|threat|ict_index|influence_rank|influence_rank_type|creativity_rank|creativity_rank_type|threat_rank|threat_rank_type|ict_index_rank|ict_index_rank_type|
-|-----:|:---------------|:---------------------|:-----------|---------------:|-------:|---------------:|------------------:|:---------------|-----------:|------------------:|----------:|---------------:|----------:|---------------:|-----------------:|------------:|------------------:|-------------------:|---------------:|------------:|--------:|--------:|------:|------------:|-------------:|---------:|------------:|-----------------:|----------------------:|------------------:|-----------------------:|--------------:|-------------------:|-----------------:|----------------------:|
+|:key: id|first_name|second_name|web_name|element_type|team|total_points|dreamteam_count|in_dreamteam|now_cost|points_per_game|minutes|goals_scored|assists|clean_sheets|goals_conceded|own_goals|penalties_saved|penalties_missed|yellow_cards|red_cards|saves|bonus|bps|influence|creativity|threat|ict_index|influence_rank|influence_rank_type|creativity_rank|creativity_rank_type|threat_rank|threat_rank_type|ict_index_rank|ict_index_rank_type|
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 |1|Mesut|Özil|Özil|3|1|0|0|False|68|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|604|240|604|240|604|240|604|240|
 |2|Sokratis|Papastathopoulos|Sokratis|2|1|0|0|False|49|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|566|212|556|212|543|206|567|212|
 |3|David|LuizMoreiraMarinho|DavidLuiz|2|1|7|0|False|55|1.2|364|0|0|0|7|0|0|0|0|0|0|0|52|72|23.1|22|11.7|239|93|270|79|267|78|297|100|
@@ -55,7 +55,7 @@ players = pd.json_normalize(
 ```
 
 |:key: id|plural_name|plural_name_short|singular_name|
-|-----:|:--------------|:--------------------|:----------------|
+| --- | --- | --- | --- |
 |1|Goalkeepers|GKP|Goalkeeper|
 |2|Defenders|DEF|Defender|
 |3|Midfielders|MID|Midfielder|
@@ -73,7 +73,7 @@ players = pd.json_normalize(
 ```
 
 |:key: id|name|short_name|strength|strength_overall_home|strength_overall_away|strength_attack_home|strength_attack_away|strength_defence_home|strength_defence_away|
-|-----:|------:|:---------------|:-------------|-----------:|------------------------:|------------------------:|-----------------------:|-----------------------:|------------------------:|------------------------:|
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 |1|Arsenal|ARS|4|1190|1210|1170|1210|1190|1200|
 |2|AstonVilla|AVL|3|1150|1160|1150|1150|1180|1210|
 |3|Brighton|BHA|3|1080|1100|1150|1180|1090|1100|
@@ -114,7 +114,7 @@ get_gameweek_history(24)
 `Out:`
 
 |element|fixture|opponent_team|total_points|was_home|kickoff_time|team_h_score|team_a_score|round|minutes|goals_scored|assists|clean_sheets|goals_conceded|own_goals|penalties_saved|penalties_missed|yellow_cards|red_cards|saves|bonus|bps|influence|creativity|threat|ict_index|value|transfers_balance|selected|transfers_in|transfers_out|
-|----------:|----------:|----------------:|---------------:|:-----------|:---------------------|---------------:|---------------:|--------:|----------:|---------------:|----------:|---------------:|-----------------:|------------:|------------------:|-------------------:|---------------:|------------:|--------:|--------:|------:|------------:|-------------:|---------:|------------:|--------:|--------------------:|-----------:|---------------:|----------------:|
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 |24|2|8|0|False|2020-09-12T11:30:00Z|0|3|1|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|55|0|491508|0|0|
 |24|9|19|2|True|2020-09-19T19:00:00Z|2|1|2|88|0|0|0|1|0|0|0|0|0|0|0|8|7.4|20.3|30|5.8|54|-145334|357292|7716|153050|
 |24|23|11|0|False|2020-09-28T19:00:00Z|3|1|3|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|54|-81091|286264|14805|95896|
