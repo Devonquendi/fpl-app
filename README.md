@@ -112,6 +112,7 @@ get_gameweek_history(24)
 
 ```
 `Out:`
+
 |element|fixture|opponent_team|total_points|was_home|kickoff_time|team_h_score|team_a_score|round|minutes|goals_scored|assists|clean_sheets|goals_conceded|own_goals|penalties_saved|penalties_missed|yellow_cards|red_cards|saves|bonus|bps|influence|creativity|threat|ict_index|value|transfers_balance|selected|transfers_in|transfers_out|
 |----------:|----------:|----------------:|---------------:|:-----------|:---------------------|---------------:|---------------:|--------:|----------:|---------------:|----------:|---------------:|-----------------:|------------:|------------------:|-------------------:|---------------:|------------:|--------:|--------:|------:|------------:|-------------:|---------:|------------:|--------:|--------------------:|-----------:|---------------:|----------------:|
 |24|2|8|0|False|2020-09-12T11:30:00Z|0|3|1|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|55|0|491508|0|0|
@@ -119,6 +120,7 @@ get_gameweek_history(24)
 |24|23|11|0|False|2020-09-28T19:00:00Z|3|1|3|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|54|-81091|286264|14805|95896|
 |24|29|15|8|True|2020-10-04T13:00:00Z|2|1|4|86|1|0|0|1|0|0|0|0|0|0|1|29|40.6|6|53|10|53|-47534|243259|9105|56639|
 |24|44|12|2|False|2020-10-17T16:30:00Z|1|0|5|90|0|0|0|1|0|0|0|0|0|0|0|18|20.6|17.5|38|7.6|53|-24953|224096|16280|41233|
+
 This function can be applied across all players to create a dataframe of all player gameweek scores:
 ```python
 players = players['id'].apply(get_gameweek_history)
