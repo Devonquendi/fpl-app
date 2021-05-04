@@ -1,4 +1,4 @@
-# fantasy-premier-league
+# Fantasy Premier League analytics
 Data-driven decision making tool for [Fantasy Premier League](https://fantasy.premierleague.com/)
 
 ## List of useful links:
