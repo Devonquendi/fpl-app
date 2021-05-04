@@ -3,7 +3,7 @@ Data-driven decision making tool for [Fantasy Premier League](https://fantasy.pr
 
 ## List of useful links:
   * [Fantasy Premier League Value Analysis Python Tutorial using the FPL API](https://towardsdatascience.com/fantasy-premier-league-value-analysis-python-tutorial-using-the-fpl-api-8031edfe9910)
-  * [Reddit thread](https://www.reddit.com/r/FantasyPL/comments/c64rrx/fpl_api_url_has_been_changed/)
+  * [Cheatsheet of all current FPL endpoints](https://www.reddit.com/r/FantasyPL/comments/f8t3bw/cheatsheet_of_all_current_fpl_endpoints/)
 
 ## Getting started
 
