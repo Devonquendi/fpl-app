@@ -12,9 +12,9 @@ Get a list of the fields availabe at the `bootstrap-static` endpoint:
 import requests, json
 import pandas as pd
 
-fpl_url = 'https://fantasy.premierleague.com/api/'
+base_url = 'https://fantasy.premierleague.com/api/'
 
-r = requests.get(fpl_url + 'bootstrap-static/')
+r = requests.get(base_url + 'bootstrap-static/')
 print(r.json().keys())
 ```
 `Out:`
@@ -28,7 +28,7 @@ The three main fields of interest are `elements`, `element_types` and `teams`
 The `elements` field contains data for every active player in the current season.
 
 ```python
-r = requests.get(fpl_url + 'bootstrap-static/')
+r = requests.get(base_url + 'bootstrap-static/')
 
 players = pd.json_normalize(
     r.json()['elements']
