@@ -1,0 +1,12 @@
+name: fpl
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - pip
+  - python=3.7
+  - ipykernel
+  - numpy
+  - pandas
+  - sasoptpy
+  - tqdm
