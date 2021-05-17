@@ -9,7 +9,16 @@ class SelectionModel:
 
     def __init__(self, forecasts_file):
 
-        self.positions = FplApiData().transform_positions()
+        # API data
+        api_data = FplApiData()
+        # position names and squad limits
+        self.positions = api_data.transform_positions()
+        # current squad
+        self.initial_squad = api_data.current_squad['element'].values.tolist()
+        # in the bank
+        self.bank = api_data.bank
+        
+        # FplReview data
         self.df = pd.read_csv(forecasts_file)
         
 
@@ -24,7 +33,7 @@ class SelectionModel:
         model = so.Model(model_name)
 
         # Variables
-        squad = model.add_variables(player_list, name='squad', vartype=so.binary)
+        squad = model.add_variables(player_list, name='squad',vartype=so.binary)
         lineup = model.add_variables(player_list, name='lineup', vartype=so.binary)
         captain = model.add_variables(player_list, name='captain', vartype=so.binary)
         vicecap = model.add_variables(player_list, name='vicecap', vartype=so.binary)
@@ -35,37 +44,44 @@ class SelectionModel:
         model.add_constraint(squad_count == 15, name='squad_count')
         # 11 players in starting lineup
         model.add_constraint(
-            so.expr_sum(lineup[p] for p in player_list) == 11, name='lineup_count'
+            so.expr_sum(lineup[p] for p in player_list) == 11,
+            name='lineup_count'
         )
         # 1 captain
         model.add_constraint(
-            so.expr_sum(captain[p] for p in player_list) == 1, name='captain_count'
+            so.expr_sum(captain[p] for p in player_list) == 1,
+            name='captain_count'
         )
         # 1 vice-captain
         model.add_constraint(
-            so.expr_sum(vicecap[p] for p in player_list) == 1, name='vicecap_count'
+            so.expr_sum(vicecap[p] for p in player_list) == 1,
+            name='vicecap_count'
         )
         # players in starting lineup must also be in squad
         model.add_constraints(
-            (lineup[p] <= squad[p] for p in player_list), name='lineup_squad_rel'
+            (lineup[p] <= squad[p] for p in player_list),
+            name='lineup_squad_rel'
         )
         # captain must come from within squad
         model.add_constraints(
-            (captain[p] <= lineup[p] for p in player_list), name='captain_lineup_rel'
+            (captain[p] <= lineup[p] for p in player_list),
+            name='captain_lineup_rel'
         )
         # vice-captain must come from within squad
         model.add_constraints(
-            (vicecap[p] <= lineup[p] for p in player_list), name='vicecap_lineup_rel'
+            (vicecap[p] <= lineup[p] for p in player_list),
+            name='vicecap_lineup_rel'
         )
         # captain and vice-captain can't be same person
         model.add_constraints(
-            (captain[p] + vicecap[p] <= 1 for p in player_list), name='cap_vc_rel'
+            (captain[p] + vicecap[p] <= 1 for p in player_list),
+            name='cap_vc_rel'
         )
         # count of each player per position in starting lineup
         lineup_type_count = {
             t: so.expr_sum(
                 lineup[p] for p in player_list if self.df.loc[p, 'Pos'] == t
-            ) for t in self.positions
+            ) for t in position_list
         }
         # count of all players in squad must be at least 'squad_min_play'
         # and no more than 'squad_max_play' for each position type 
@@ -85,7 +101,8 @@ class SelectionModel:
         # count of all players in squad must be equal to 'squad_select'
         # for each position type 
         model.add_constraints(
-            (squad_type_count[t] == self.positions.loc[t, 'squad_select'] for t in position_list),
+            (squad_type_count[t] == self.positions.loc[t, 'squad_select'] \
+                for t in position_list),
             name='valid_squad'
         )
         # total value of squad cannot exceed budget
@@ -100,16 +117,18 @@ class SelectionModel:
         )
         # sum of starting 11 players, plus double captain score and upweight vice-captain
         total_points = so.expr_sum(
-            self.df.loc[p, 'Pts'] * (lineup[p] + captain[p] + 0.1 * vicecap[p]) for p in player_list
+            self.df.loc[p, f'{next_gw}_Pts'] * (lineup[p] + captain[p] + 0.1 * vicecap[p]) for p in player_list
         )
+
+        # Objective
         model.set_objective(-total_points, sense='N', name='total_xp')
-        model.export_mps(f'single_period_{budget}.mps')
-        command = f'cbc single_period_{budget}.mps solve solu solution_sp_{budget}.txt'
+        model.export_mps(f'{model_name}.mps')
+        command = f'cbc {model_name}.mps solve solu {model_name}.txt'
 
         Popen(command, shell=False, stdout=DEVNULL).wait()
         for v in model.get_variables():
             v.set_value(0)
-        with open(f'solution_sp_{budget}.txt', 'r') as f:
+        with open(f'{model_name}.txt', 'r') as f:
             for line in f:
                 if 'objective value' in line:
                     continue
@@ -128,16 +147,26 @@ class SelectionModel:
                     lp['Name'], lp['Pos'], lp['Team'], lp['BV'], round(lp[f'{next_gw}_Pts'], 2), is_lineup, is_captain, is_vice
                 ])
 
-        picks_df = pd.DataFrame(picks, columns=['Name', 'Pos', 'Team', 'Price', 'xP', 'lineup', 'captain', 'vicecaptain']).sort_values(by=['lineup', 'Pos', 'xP'], ascending=[False, True, True])
-        total_xp = so.expr_sum((lineup[p] + captain[p]) * self.df.loc[p, f'{next_gw}_Pts'] for p in player_list).get_value()
+        picks_df = pd.DataFrame(
+            picks,
+            columns=['Name', 'Pos', 'Team', 'Price', 'xP', 'lineup', 'captain',
+                     'vicecaptain']
+        ).sort_values(by=['lineup', 'Pos', 'xP'], ascending=[False, True, True])
+        
+        total_xp = so.expr_sum(
+            (lineup[p] + captain[p]) * self.df.loc[p, f'{next_gw}_Pts'] for p in player_list
+        ).get_value()
 
         print(f'Total expected value for budget {budget}: {total_xp}')
+        print(picks_df)
 
-        return {'model': model, 'picks': picks_df, 'total_xp': total_xp}
+        os.remove(f'{model_name}.txt')
+
+        return picks_df
 
 
 if __name__ == '__main__':
 
     model = SelectionModel(os.path.join('..', 'data', 'fplreview', 'gw37-38.csv'))
 
-    model.create_model()
+    picks = model.create_model()
