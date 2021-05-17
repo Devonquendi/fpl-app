@@ -61,14 +61,12 @@ class SelectionModel:
         model.add_constraints(
             (captain[p] + vicecap[p] <= 1 for p in player_list), name='cap_vc_rel'
         )
-
         # count of each player per position in starting lineup
         lineup_type_count = {
             t: so.expr_sum(
                 lineup[p] for p in player_list if self.df.loc[p, 'Pos'] == t
             ) for t in self.positions
         }
-
         # count of all players in squad must be at least 'squad_min_play'
         # and no more than 'squad_max_play' for each position type 
         model.add_constraints(
@@ -78,25 +76,21 @@ class SelectionModel:
             ] for t in position_list),
             name='valid_formation'
         )
-
         # count of each player per position in squad
         squad_type_count = {
             t: so.expr_sum(
                 squad[p] for p in player_list if self.df.loc[p, 'Pos'] == t
             ) for t in position_list
         }
-
         # count of all players in squad must be equal to 'squad_select'
         # for each position type 
         model.add_constraints(
             (squad_type_count[t] == self.positions.loc[t, 'squad_select'] for t in position_list),
             name='valid_squad'
         )
-
         # total value of squad cannot exceed budget
         price = so.expr_sum(self.df.loc[p, 'BV'] * squad[p] for p in player_list)
         model.add_constraint(price <= budget, name='budget_limit')
-
         # no more than 3 players per team
         model.add_constraints(
             (so.expr_sum(
@@ -104,12 +98,10 @@ class SelectionModel:
             ) <= 3 for t in team_list),
             name='team_limit'
         )
-
         # sum of starting 11 players, plus double captain score and upweight vice-captain
         total_points = so.expr_sum(
             self.df.loc[p, 'Pts'] * (lineup[p] + captain[p] + 0.1 * vicecap[p]) for p in player_list
         )
-
         model.set_objective(-total_points, sense='N', name='total_xp')
         model.export_mps(f'single_period_{budget}.mps')
         command = f'cbc single_period_{budget}.mps solve solu solution_sp_{budget}.txt'
@@ -149,5 +141,3 @@ if __name__ == '__main__':
     model = SelectionModel(os.path.join('..', 'data', 'fplreview', 'gw37-38.csv'))
 
     model.create_model()
-
-
