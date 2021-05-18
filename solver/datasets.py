@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 from tqdm.auto import tqdm
 from icecream import ic
+import os
 
 
 BASE_URL = 'https://fantasy.premierleague.com/api/'
@@ -21,15 +22,16 @@ def get_player_gameweek_history(player_id):
 
 
 class FplApiData:
-
-    # ToDo: join FplReview data and API data
-
-    '''Downloads all relevant data from FPL API'''
     
     def __init__(self, team_id, gw):
+        '''Downloads all relevant data from FPL API'''
         
         # Bootstrap-static data
         api_data = requests.get(BASE_URL+'bootstrap-static/').json()
+        # Manager data
+        manager_data = requests.get(
+            f'{BASE_URL}entry/{team_id}/event/{gw}/picks/').json()
+        
         # player data
         self.players = pd.DataFrame(api_data['elements'])[
             ['first_name', 'second_name', 'web_name', 'id', 'team',
@@ -39,22 +41,52 @@ class FplApiData:
              'penalties_missed', 'yellow_cards', 'red_cards', 'saves', 'bonus',
              'bps', 'influence', 'creativity', 'threat', 'ict_index']
         ]
+        self.players.rename(columns={
+            'id': 'player_id',
+            'team': 'team_id',
+            'element_type': 'position_id'}, inplace=True
+        )
         # position data
         self.positions = pd.DataFrame(api_data['element_types']).drop(
             ['plural_name', 'plural_name_short', 'ui_shirt_specific',
              'sub_positions_locked', 'element_count'], axis=1)
+        self.positions.rename(columns={
+            'id': 'position_id',
+            'singular_name_short': 'position_name'}, inplace=True)
         # team data
         self.teams = pd.DataFrame(api_data['teams']).drop(
             ['code', 'played', 'form', 'win', 'draw', 'loss', 'points',
             'position', 'team_division', 'unavailable', 'pulse_id'], axis=1)
-
-        # Manager data
-        manager_data = requests.get(
-            f'{BASE_URL}entry/{team_id}/event/{gw}/picks/').json()
+        self.teams.rename(columns={
+            'id': 'team_id',
+            'name': 'team_name'}, inplace=True)
         # manager's current squad
         self.current_squad = pd.DataFrame(manager_data['picks'])
+        self.current_squad.rename(columns={'element': 'player_id'}, inplace=True)
         # cash in the bank
         self.bank = manager_data['entry_history']['bank'] / 10
+
+    
+    def make_opt_df(self, forecasts_file):
+
+        forecasts = pd.read_csv(forecasts_file)
+
+        df = self.players[
+            ['player_id', 'web_name', 'position_id', 'team_id', 'now_cost']
+        ].merge(
+            self.teams[
+                ['team_id', 'team_name']],
+            on='team_id'
+        ).merge(
+            self.positions[
+                ['position_id', 'position_name']],
+            on='position_id'   
+        )
+
+        # ToDo: combine forecasts
+        # alternatively, make a forecasts df with player, position and team IDs
+
+        return df
 
 
     def make_points_df(self):
@@ -94,9 +126,8 @@ if __name__ == '__main__':
 
     data = FplApiData(team_id=384484, gw=36)
 
-    print(data.players)
-    print(data.positions)
-    print(data.teams)
-    print(data.current_squad)
+    df = data.make_opt_df(os.path.join('..', 'data', 'fplreview', 'gw37-38.csv'))
+
+    print(df)
 
 
