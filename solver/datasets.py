@@ -1,6 +1,7 @@
 import pandas as pd
 import requests
 from tqdm.auto import tqdm
+from icecream import ic
 
 
 BASE_URL = 'https://fantasy.premierleague.com/api/'
@@ -32,23 +33,20 @@ class FplApiData:
         # player data
         self.players = pd.DataFrame(api_data['elements'])[
             ['first_name', 'second_name', 'web_name', 'id', 'team',
-             'total_points', 'dreamteam_count', 'element_type', 'in_dreamteam',
-             'now_cost', 'points_per_game', 'minutes', 'goals_scored',
-             'assists', 'clean_sheets', 'goals_conceded', 'own_goals',
-             'penalties_saved', 'penalties_missed', 'yellow_cards', 'red_cards',
-             'saves', 'bonus', 'bps', 'influence', 'creativity', 'threat',
-             'ict_index', 'influence_rank', 'influence_rank_type',
-             'creativity_rank', 'creativity_rank_type', 'threat_rank',
-             'threat_rank_type', 'ict_index_rank', 'ict_index_rank_type']
+             'total_points', 'element_type', 'now_cost', 'points_per_game',
+             'minutes', 'goals_scored', 'assists', 'clean_sheets',
+             'goals_conceded', 'own_goals', 'penalties_saved',
+             'penalties_missed', 'yellow_cards', 'red_cards', 'saves', 'bonus',
+             'bps', 'influence', 'creativity', 'threat', 'ict_index']
         ]
         # position data
         self.positions = pd.DataFrame(api_data['element_types']).drop(
             ['plural_name', 'plural_name_short', 'ui_shirt_specific',
-             'sub_positions_locked'], axis=1)
+             'sub_positions_locked', 'element_count'], axis=1)
         # team data
         self.teams = pd.DataFrame(api_data['teams']).drop(
-            ['code', 'draw', 'form', 'loss', 'points', 'position',
-            'team_division', 'unavailable', 'pulse_id'], axis=1)
+            ['code', 'played', 'form', 'win', 'draw', 'loss', 'points',
+            'position', 'team_division', 'unavailable', 'pulse_id'], axis=1)
 
         # Manager data
         manager_data = requests.get(
@@ -56,7 +54,7 @@ class FplApiData:
         # manager's current squad
         self.current_squad = pd.DataFrame(manager_data['picks'])
         # cash in the bank
-        self.bank = manager_data['bank'] / 10
+        self.bank = manager_data['entry_history']['bank'] / 10
 
 
     def make_points_df(self):
@@ -90,5 +88,15 @@ class FplApiData:
         return positions
 
 
+if __name__ == '__main__':
+
+    # for testing
+
+    data = FplApiData(team_id=384484, gw=36)
+
+    print(data.players)
+    print(data.positions)
+    print(data.teams)
+    print(data.current_squad)
 
 
