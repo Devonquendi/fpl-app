@@ -1,7 +1,6 @@
 import pandas as pd
 import requests
 from tqdm.auto import tqdm
-from icecream import ic
 import os
 
 
@@ -46,6 +45,7 @@ class FplApiData:
             'team': 'team_id',
             'element_type': 'position_id'}, inplace=True
         )
+        self.players.set_index(['player_id'], inplace=True)
         # position data
         self.positions = pd.DataFrame(api_data['element_types']).drop(
             ['plural_name', 'plural_name_short', 'ui_shirt_specific',
@@ -53,6 +53,7 @@ class FplApiData:
         self.positions.rename(columns={
             'id': 'position_id',
             'singular_name_short': 'position_name'}, inplace=True)
+        self.positions.set_index(['position_id'], inplace=True)
         # team data
         self.teams = pd.DataFrame(api_data['teams']).drop(
             ['code', 'played', 'form', 'win', 'draw', 'loss', 'points',
@@ -60,6 +61,7 @@ class FplApiData:
         self.teams.rename(columns={
             'id': 'team_id',
             'name': 'team_name'}, inplace=True)
+        self.teams.set_index(['team_id'], inplace=True)
         # manager's current squad
         self.current_squad = pd.DataFrame(manager_data['picks'])
         self.current_squad.rename(columns={'element': 'player_id'}, inplace=True)
@@ -70,23 +72,31 @@ class FplApiData:
     def make_opt_df(self, forecasts_file):
 
         forecasts = pd.read_csv(forecasts_file)
+        # rename columns to match api data
+        forecasts.rename(columns={
+            'Pos': 'position_name',
+            'Name': 'web_name',
+            'Team': 'team_name'}, inplace=True)
+        forecasts.columns = forecasts.columns.str.lower()
+        # replace position names with api names
+        forecasts['position_name'].replace(
+            {'G': 'GKP', 'D': 'DEF', 'M': 'MID', 'F': 'FWD'}, inplace=True)
 
         df = self.players[
-            ['player_id', 'web_name', 'position_id', 'team_id', 'now_cost']
-        ].merge(
+            ['web_name', 'position_id', 'team_id', 'now_cost']
+        ].reset_index().merge(
             self.teams[
-                ['team_id', 'team_name']],
+                ['team_name']],
             on='team_id'
         ).merge(
             self.positions[
-                ['position_id', 'position_name']],
-            on='position_id'   
+                ['position_name']],
+            on='position_id'
+        ).merge(
+            forecasts, on=['team_name', 'web_name', 'position_name']
         )
 
-        # ToDo: combine forecasts
-        # alternatively, make a forecasts df with player, position and team IDs
-
-        return df
+        return df.sort_values('player_id')
 
 
     def make_points_df(self):
