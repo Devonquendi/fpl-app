@@ -32,35 +32,38 @@ class FplApiData:
             f'{BASE_URL}entry/{team_id}/event/{gw}/picks/').json()
         
         # player data
-        self.players = pd.DataFrame(api_data['elements'])[
-            ['first_name', 'second_name', 'web_name', 'id', 'team',
-             'total_points', 'element_type', 'now_cost', 'points_per_game',
-             'minutes', 'goals_scored', 'assists', 'clean_sheets',
-             'goals_conceded', 'own_goals', 'penalties_saved',
-             'penalties_missed', 'yellow_cards', 'red_cards', 'saves', 'bonus',
-             'bps', 'influence', 'creativity', 'threat', 'ict_index']
-        ]
-        self.players.rename(columns={
-            'id': 'player_id',
-            'team': 'team_id',
-            'element_type': 'position_id'}, inplace=True
-        )
+        self.players = pd.DataFrame(
+            api_data['elements'])[
+                ['first_name', 'second_name', 'web_name', 'id', 'team',
+                 'total_points', 'element_type', 'now_cost', 'points_per_game',
+                 'minutes', 'goals_scored', 'assists', 'clean_sheets',
+                 'goals_conceded', 'own_goals', 'penalties_saved', 
+                 'penalties_missed', 'yellow_cards', 'red_cards', 'saves',
+                 'bonus','bps', 'influence', 'creativity', 'threat', 'ict_index']]
+        self.players.rename(columns={'id':'player_id',
+                                     'team':'team_id',
+                                     'element_type':'position_id'},
+                            inplace=True)
         self.players.set_index(['player_id'], inplace=True)
         # position data
-        self.positions = pd.DataFrame(api_data['element_types']).drop(
-            ['plural_name', 'plural_name_short', 'ui_shirt_specific',
-             'sub_positions_locked', 'element_count'], axis=1)
-        self.positions.rename(columns={
-            'id': 'position_id',
-            'singular_name_short': 'position_name'}, inplace=True)
+        self.positions = pd.DataFrame(api_data['element_types'])
+        self.positions.drop(
+            columns=['plural_name', 'plural_name_short', 'ui_shirt_specific',
+                     'sub_positions_locked', 'element_count'],
+            axis=1, inplace=True)
+        self.positions.rename(columns={'id':'position_id',
+                                       'singular_name_short':'position_name'},
+                              inplace=True)
         self.positions.set_index(['position_id'], inplace=True)
         # team data
-        self.teams = pd.DataFrame(api_data['teams']).drop(
-            ['code', 'played', 'form', 'win', 'draw', 'loss', 'points',
-            'position', 'team_division', 'unavailable', 'pulse_id'], axis=1)
-        self.teams.rename(columns={
-            'id': 'team_id',
-            'name': 'team_name'}, inplace=True)
+        self.teams = pd.DataFrame(api_data['teams'])
+        self.teams.drop(
+            columns=['code', 'played', 'form', 'win', 'draw', 'loss', 'points',
+                     'position', 'team_division', 'unavailable', 'pulse_id'],
+            axis=1, inplace=True)
+        self.teams.rename(columns={'id': 'team_id',
+                                   'name': 'team_name'},
+                          inplace=True)
         self.teams.set_index(['team_id'], inplace=True)
         # manager's current squad
         self.current_squad = pd.DataFrame(manager_data['picks'])
@@ -73,14 +76,14 @@ class FplApiData:
 
         forecasts = pd.read_csv(forecasts_file)
         # rename columns to match api data
-        forecasts.rename(columns={
-            'Pos': 'position_name',
-            'Name': 'web_name',
-            'Team': 'team_name'}, inplace=True)
+        forecasts.rename(columns={'Pos': 'position_name',
+                                  'Name': 'web_name',
+                                  'Team': 'team_name'},
+                         inplace=True)
         forecasts.columns = forecasts.columns.str.lower()
         # replace position names with api names
         forecasts['position_name'].replace(
-            {'G': 'GKP', 'D': 'DEF', 'M': 'MID', 'F': 'FWD'}, inplace=True)
+            {'G':'GKP', 'D':'DEF', 'M':'MID', 'F':'FWD'}, inplace=True)
 
         df = self.players[
             ['web_name', 'position_id', 'team_id', 'now_cost']
@@ -114,20 +117,6 @@ class FplApiData:
         df.rename({'element':'player_id'}, axis=1, inplace=True)
 
         return df
-
-
-    def transform_positions(self):
-
-        '''Tranforms positions dataframe for use with optimisation model'''
-
-        positions = self.positions.copy()
-        positions['Pos'] = positions['singular_name'].str[0]
-        positions.set_index('Pos', inplace=True)
-        positions = positions[
-            ['squad_select', 'squad_min_play' ,'squad_max_play']
-        ]
-
-        return positions
 
 
 if __name__ == '__main__':
