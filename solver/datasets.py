@@ -99,7 +99,9 @@ class FplApiData:
             forecasts, on=['team_name', 'web_name', 'position_name']
         )
 
-        return df.sort_values('player_id')
+        df.set_index(['player_id'], inplace=True)
+
+        return df
 
 
     def make_points_df(self):
