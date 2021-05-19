@@ -1,5 +1,5 @@
-id,singular_name,singular_name_short
-1,Goalkeeper,GKP
-2,Defender,DEF
-3,Midfielder,MID
-4,Forward,FWD
+id,singular_name,singular_name_short,squad_select,squad_min_play,squad_max_play
+1,Goalkeeper,GKP,2,1,1
+2,Defender,DEF,5,3,5
+3,Midfielder,MID,5,2,5
+4,Forward,FWD,3,1,3
