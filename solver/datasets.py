@@ -1,5 +1,6 @@
 import pandas as pd
 import os, requests, time
+from argparse import ArgumentParser
 from tqdm.auto import tqdm
 
 
@@ -159,12 +160,22 @@ class FplApiData:
 
 if __name__ == '__main__':
 
-    # for testing
+    parser = ArgumentParser(description='Downloads all datasets from FPL API')
+    parser.add_argument('-o', '--output_dir', 
+                        default=os.path.join('..', 'data', '2020-21'),
+                        help='relative path to output folder', type=str)
+    args = parser.parse_args()
 
-    data = FplApiData(team_id=384484, gw=36)
-
-    df = data.make_opt_df(os.path.join('..', 'data', 'fplreview', 'gw37-38.csv'))
-
-    print(df)
-
-
+    # make sure using correct separators for path names
+    data_dir = args.output_dir.replace('/', os.sep)
+    
+    # get all data from API
+    api_data = FplApiData()
+    # save all dataframes as CSVs in chosen folder
+    api_data.players.to_csv(os.path.join(data_dir, 'players.csv'))
+    api_data.positions.to_csv(os.path.join(data_dir, 'positions.csv'))
+    api_data.teams.to_csv(os.path.join(data_dir, 'teams.csv'))
+    api_data.make_gameweek_history_df().to_csv(
+        os.path.join(data_dir, 'gameweek_history.csv'), index=False)
+    api_data.make_gameweek_history_df().to_csv(
+        os.path.join(data_dir, 'season_history.csv'), index=False)
