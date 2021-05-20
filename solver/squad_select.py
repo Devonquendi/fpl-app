@@ -89,7 +89,7 @@ class SelectionModel:
             t: so.expr_sum(lineup[p] for p in players
                            if self.forecasts.loc[p, 'position_id'] == t)
             for t in positions}
-        # count of all players in squad must be at least 'squad_min_play'
+        # count of all players in lineup must be at least 'squad_min_play'
         # and no more than 'squad_max_play' for each position type 
         model.add_constraints(
             (lineup_type_count[t] == [self.positions.loc[t, 'squad_min_play'],
@@ -172,7 +172,7 @@ class SelectionModel:
         return picks_df
 
 
-    def solve_multi_week(self, ft, horizon, objective='regular', decay_base=.84):
+    def solve_multi_week(self, ft, horizon, decay_base=1.0):
         
         # ToDo: absorb optimal squad method into this one
         #       compare your own team outcomes with the optimal squad
@@ -187,10 +187,8 @@ class SelectionModel:
             Number of available free transfers (currently)
         horizon: integer
             Number of weeks to consider in optimization
-        objective: string
-            Type of objective "regular" or "decay"
         decay_base: float
-            Base for the decay function
+            Base for the decay function, default of 1 means no decay
         '''
 
         # Data
@@ -203,10 +201,7 @@ class SelectionModel:
         all_gw = [self.gw-1] + gameweeks
 
         # Model
-        model_name = f'gw{self.gw}_{horizon}weeks_{objective}'
-        if objective == 'decay':
-            model_name += str(decay_base)
-
+        model_name = f'w{self.gw}_h{horizon}_d{decay_base}'
         model = so.Model(model_name)
 
         # Variables
@@ -232,16 +227,6 @@ class SelectionModel:
             gameweeks, name='aux', vartype=so.binary)
         
         # Dictionaries
-        # lineup counts for position types per gameweek
-        lineup_type_count = {
-            (t,w): so.expr_sum(lineup[p,w] for p in players
-                            if self.forecasts.loc[p, 'position_id'] == t)
-            for t in positions for w in gameweeks}
-        # squad counts for position types per gameweek
-        squad_type_count = {
-            (t,w): so.expr_sum(squad[p,w] for p in players
-                            if self.forecasts.loc[p, 'position_id'] == t)
-            for t in positions for w in gameweeks}
         # sell prices of all players
         sell_price = self.forecasts['sv'].to_dict()
         # buy prices of all players
@@ -257,10 +242,6 @@ class SelectionModel:
         # player weekly forecast points
         points_player_week = {(p,w): self.forecasts.loc[p, f'{w}_pts']
                             for p in players for w in gameweeks}
-        # number of players in squad per gameweek
-        squad_count = {
-            w: so.expr_sum(squad[p, w] for p in players)
-            for w in gameweeks}
         # number of transfers made each week
         number_of_transfers = {w: so.expr_sum(transfer_out[p,w] for p in players)
                             for w in gameweeks}
@@ -283,90 +264,123 @@ class SelectionModel:
         # add current free transfers
         model.add_constraint(free_transfers[self.gw-1] == ft, name='initial_ft')
 
-        # Constraints
+        # Constraints (per week)
+        # 15 players in squad
+        squad_count = {
+            w: so.expr_sum(squad[p, w] for p in players)
+            for w in gameweeks}
         model.add_constraints(
             (squad_count[w] == 15 for w in gameweeks), name='squad_count')
+        # 11 players in starting lineup
         model.add_constraints(
             (so.expr_sum(lineup[p,w] for p in players) == 11 for w in gameweeks), 
             name='lineup_count')
+        # 1 captain
         model.add_constraints(
             (so.expr_sum(captain[p,w] for p in players) == 1 for w in gameweeks), 
             name='captain_count')
+        # 1 vice-captain
         model.add_constraints(
             (so.expr_sum(vicecap[p,w] for p in players) == 1 for w in gameweeks), 
             name='vicecap_count')
+        # players in starting lineup must also be in squad
         model.add_constraints(
             (lineup[p,w] <= squad[p,w] for p in players for w in gameweeks), 
             name='lineup_squad_rel')
+        # captain must come from within squad
         model.add_constraints(
             (captain[p,w] <= lineup[p,w] for p in players for w in gameweeks), 
             name='captain_lineup_rel')
+        # vice-captain must come from within squad
         model.add_constraints(
             (vicecap[p,w] <= lineup[p,w] for p in players for w in gameweeks), 
             name='vicecap_lineup_rel')
+        # captain and vice-captain can't be same person
         model.add_constraints(
             (captain[p,w] + vicecap[p,w] <= 1 for p in players for w in gameweeks), 
             name='cap_vc_rel')
+        # count of each player per position in starting lineup
+        lineup_type_count = {
+            (t,w): so.expr_sum(lineup[p,w] for p in players
+                               if self.forecasts.loc[p, 'position_id'] == t)
+            for t in positions for w in gameweeks}
+        # count of all players in lineup must be at least 'squad_min_play'
+        # and no more than 'squad_max_play' for each position type
         model.add_constraints(
             (
-                lineup_type_count[t,w] == [self.positions.loc[t, 'squad_min_play'],
-                                        self.positions.loc[t, 'squad_max_play']] 
+                lineup_type_count[t,w] == [
+                    self.positions.loc[t, 'squad_min_play'],
+                    self.positions.loc[t, 'squad_max_play']] 
                 for t in positions for w in gameweeks),
             name='valid_formation')
+        # count of each player per position in squad
+        squad_type_count = {
+            (t,w): so.expr_sum(squad[p,w] for p in players
+                               if self.forecasts.loc[p, 'position_id'] == t)
+            for t in positions for w in gameweeks}
+        # count of all players in squad must be equal to 'squad_select'
+        # for each position type
         model.add_constraints(
             (
                 squad_type_count[t,w] == self.positions.loc[t, 'squad_select']
                 for t in positions for w in gameweeks),
             name='valid_squad')
+        # no more than 3 players per team
         model.add_constraints(
             (
                 so.expr_sum(squad[p,w] for p in players
-                            if self.forecasts.loc[p, 'team_name'] == t)
+                            if self.forecasts.loc[p, 'team_id'] == t)
                 <= 3 for t in teams for w in gameweeks),
             name='team_limit')
         # Transfer constraints
+        # handles transfers in and out of squad
         model.add_constraints(
             (
                 squad[p,w] == squad[p,w-1] + transfer_in[p,w] - transfer_out[p,w]
                 for p in players for w in gameweeks),
             name='squad_transfer_rel')
+        # handles running bank balance (assumes no changes in player values)
         model.add_constraints(
             (
                 in_the_bank[w] == in_the_bank[w-1] + sold_amount[w] - bought_amount[w]
                 for w in gameweeks),
             name='cont_budget')
         # Free transfer constraints
+        # 1 free transfer per week
         model.add_constraints(
-            (free_transfers[w] == aux[w] + 1 for w in gameweeks), name='aux_ft_rel')
+            (free_transfers[w] == aux[w] + 1 for w in gameweeks),
+            name='aux_ft_rel')
+        # no more than 2 free transfers per week ??
         model.add_constraints(
             (
                 free_transfers[w-1] - number_of_transfers[w-1] <= 2 * aux[w]
                 for w in gameweeks),
             name='force_aux_1')
+        # cannot make more than 14 paid transfers in a week ??
         model.add_constraints(
             (
                 free_transfers[w-1] - number_of_transfers[w-1] >= aux[w]
                 + (-14)*(1-aux[w]) 
                 for w in gameweeks),
             name='force_aux_2')
+        # not sure what this does ??
         model.add_constraints(
             (penalized_transfers[w] >= transfer_diff[w] for w in gameweeks),
             name='pen_transfer_rel')
 
         # Objectives
+        # sum of starting 11 players, plus double captain score 
+        # and upweight vice-captain
         gw_xp = {
             w: so.expr_sum(points_player_week[p,w]
                         * (lineup[p,w] + captain[p,w]
                         + 0.1*vicecap[p,w]) for p in players)
             for w in gameweeks}
+        # subtract transfer costs
         gw_total = {w: gw_xp[w] - 4 * penalized_transfers[w] for w in gameweeks}
-        if objective == 'regular':
-            total_xp = so.expr_sum(gw_total[w] for w in gameweeks)
-            model.set_objective(-total_xp, sense='N', name='total_regular_xp')
-        else:
-            decay_objective = so.expr_sum(
-                gw_total[w] * pow(decay_base, w-self.gw) for w in gameweeks)
-            model.set_objective(-decay_objective, sense='N', name='total_decay_xp')
+        total_xp = so.expr_sum(
+            gw_total[w] * pow(decay_base, w-self.gw) for w in gameweeks)
+        model.set_objective(-total_xp, sense='N', name='total_xp')
 
         # Solve
         model.export_mps(f'{model_name}.mps')
@@ -446,6 +460,9 @@ if __name__ == '__main__':
                         help='number of free transfers for upcoming week')
     parser.add_argument('-hz', '--horizon', type=int, default=2,
                         help='number of weeks to look forward')
+    parser.add_argument('-d', '--decay', type=float, default=1.0,
+                        help='number of weeks to look forward')
+
     args = parser.parse_args()
 
     # make sure using correct separators for path names
@@ -455,8 +472,8 @@ if __name__ == '__main__':
         forecasts_file=forecasts)
 
     print('OPTIMIZING ACTION PLAN')
-    picks = model.solve_multi_week(ft=args.free_transfers, horizon=args.horizon,
-                                   objective='decay')
+    picks = model.solve_multi_week(
+        ft=args.free_transfers, horizon=args.horizon, decay_base=args.decay)
     print('\nSQUAD PICKS:')
     print(picks)
     print('\n\nFINDING OPTIMAL SQUAD FOR UPCOMING WEEK')
