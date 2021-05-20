@@ -1,6 +1,7 @@
 import pandas as pd
 import sasoptpy as so
 import os
+from argparse import ArgumentParser
 from subprocess import Popen, DEVNULL
 from datasets import FplApiData
 
@@ -164,7 +165,6 @@ class SelectionModel:
                                 for p in players).get_value()
 
         print(f'Total expected value for budget {budget:.1f}: {total_xp:.2f}')
-        print(picks_df)
 
         os.remove(f'{model_name}.mps')
         os.remove(f'{model_name}.txt')
@@ -371,7 +371,7 @@ class SelectionModel:
         # Solve
         model.export_mps(f'{model_name}.mps')
         command = f'cbc {model_name}.mps solve solu {model_name}.txt'
-        process = Popen(command, shell=False) # add 'stdout=DEVNULL' for disabling logs
+        process = Popen(command, stdout=DEVNULL, shell=False) # DEVNULL: nologs
         process.wait()
 
         # Parsing
@@ -434,8 +434,32 @@ class SelectionModel:
 
 if __name__ == '__main__':
 
-    model = SelectionModel(team_id=384484, gw=37,
-        forecasts_file=os.path.join('..', 'data', 'fplreview', 'gw37-38.csv'))
+    parser = ArgumentParser(
+        description='Optimises squad selection for given time horizon')
+    parser.add_argument('-t', '--team_id', type=str, default=384484,
+                        help='unique ID of FPL manager')
+    parser.add_argument('-w', '--gameweek', type=int, required=True,
+                        help='upcoming gameweek number')
+    parser.add_argument('-f', '--forecasts', type=str, required=True,
+                        help='path to FPLreview forecasts file')
+    parser.add_argument('-ft', '--free_transfers', type=int, default=1,
+                        help='number of free transfers for upcoming week')
+    parser.add_argument('-hz', '--horizon', type=int, default=2,
+                        help='number of weeks to look forward')
+    args = parser.parse_args()
 
-    picks = model.solve_multi_week(ft=1, horizon=2, objective='decay')
-    model.solve_optimal_squad()
+    # make sure using correct separators for path names
+    forecasts = args.forecasts.replace('/', os.sep)
+
+    model = SelectionModel(team_id=args.team_id, gw=args.gameweek,
+        forecasts_file=forecasts)
+
+    print('OPTIMIZING ACTION PLAN')
+    picks = model.solve_multi_week(ft=args.free_transfers, horizon=args.horizon,
+                                   objective='decay')
+    print('\nSQUAD PICKS:')
+    print(picks)
+    print('\n\nFINDING OPTIMAL SQUAD FOR UPCOMING WEEK')
+    optimal_squad = model.solve_optimal_squad()
+    print('\nOPTIMAL SQUAD:')
+    print(optimal_squad)
