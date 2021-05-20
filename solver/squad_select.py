@@ -10,17 +10,8 @@ class SelectionModel:
 
     def __init__(self, team_id, gw, forecasts_file):
 
-        '''
-        Downloads data from fpl api and combines with input from fplreview.com
-        Parameters
-        ----------
-        team_id: integer
-            FPL ID of the team to be optimized
-        gw: integer
-            Upcoming (next) gameweek
-        forecasts_file: string
-            path to fplreview input file
-        '''
+        '''Downloads data from fpl api 
+           and combines with input from fplreview.com'''
 
         # API data
         api_data = FplApiData(team_id=team_id, gw=gw-1)
