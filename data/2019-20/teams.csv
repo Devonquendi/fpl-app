@@ -1,4 +1,4 @@
-﻿id,name,short_name,strength,strength_overall_home,strength_overall_away,strength_attack_home,strength_attack_away,strength_defence_home,strength_defence_away
+﻿team_id,name,short_name,strength,strength_overall_home,strength_overall_away,strength_attack_home,strength_attack_away,strength_defence_home,strength_defence_away
 1,Arsenal,ARS,4,1180,1240,1170,1170,1150,1200
 2,Aston Villa,AVL,2,1020,1050,970,980,1000,1040
 3,Bournemouth,BOU,2,1020,1020,990,1030,1000,1050

@@ -1,4 +1,4 @@
-id,singular_name,singular_name_short,squad_select,squad_min_play,squad_max_play
+position_id,singular_name,position_name,squad_select,squad_min_play,squad_max_play
 1,Goalkeeper,GKP,2,1,1
 2,Defender,DEF,5,3,5
 3,Midfielder,MID,5,2,5

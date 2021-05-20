@@ -1,35 +1,50 @@
 import pandas as pd
-import requests
+import os, requests, time
 from tqdm.auto import tqdm
-import os
 
 
 BASE_URL = 'https://fantasy.premierleague.com/api/'
 
 
-def get_player_gameweek_history(player_id):
-    '''Get all gameweek info for a given player_id'''
+def get_player_gameweek_history(player_id, wait_time=.3):
+    '''Get all gameweek info for a given player_id
+       wait between requests to avoid API rate limit'''
     
     # send GET request to BASE_URL/api/element-summary/{PID}/
     data = requests.get(
             BASE_URL + 'element-summary/' + str(player_id) + '/').json()
-    
     # extract 'history' data from response into dataframe
     df = pd.json_normalize(data['history'])
+    # avoid getting rate limited
+    time.sleep(wait_time)
+    
+    return df
+
+
+def get_player_season_history(player_id, wait_time=.3):
+    '''Get all past season info for a given player_id,
+       wait between requests to avoid API rate limit'''
+    
+    # send GET request to
+    # fantasy.premierleague.com/api/element-summary/{PID}/
+    r = requests.get(
+        BASE_URL + 'element-summary/' + str(player_id) + '/').json()
+    # extract 'history_past' data from response into dataframe
+    df = pd.json_normalize(r['history_past'])
+    df.insert(0, 'id', player_id)
+    # avoid getting rate limited
+    time.sleep(wait_time)
     
     return df
 
 
 class FplApiData:
     
-    def __init__(self, team_id, gw):
+    def __init__(self, team_id=None, gw=None):
         '''Downloads all relevant data from FPL API'''
         
         # Bootstrap-static data
         api_data = requests.get(BASE_URL+'bootstrap-static/').json()
-        # Manager data
-        manager_data = requests.get(
-            f'{BASE_URL}entry/{team_id}/event/{gw}/picks/').json()
         
         # player data
         self.players = pd.DataFrame(
@@ -65,11 +80,17 @@ class FplApiData:
                                    'name': 'team_name'},
                           inplace=True)
         self.teams.set_index(['team_id'], inplace=True)
-        # manager's current squad
-        self.current_squad = pd.DataFrame(manager_data['picks'])
-        self.current_squad.rename(columns={'element': 'player_id'}, inplace=True)
-        # cash in the bank
-        self.bank = manager_data['entry_history']['bank'] / 10
+
+        # Manager data
+        if team_id != None and gw != None:
+            manager_data = requests.get(
+                f'{BASE_URL}entry/{team_id}/event/{gw}/picks/').json()
+            # manager's current squad
+            self.current_squad = pd.DataFrame(manager_data['picks'])
+            self.current_squad.rename(columns={'element': 'player_id'},
+                                      inplace=True)
+            # cash in the bank
+            self.bank = manager_data['entry_history']['bank'] / 10
 
     
     def make_opt_df(self, forecasts_file):
@@ -104,17 +125,32 @@ class FplApiData:
         return df
 
 
-    def make_points_df(self):
+    def make_gameweek_history_df(self):
         '''Create dataframe with all players' inidividual gameweek scores'''
 
         tqdm.pandas()
 
         # get gameweek histories for each player
-        df = self.players['id'].progress_apply(get_player_gameweek_history)
-
+        df = pd.Series(self.players.index).progress_apply(
+            get_player_gameweek_history)
         # combine results into single dataframe
         df = pd.concat(p for p in df)
+        # rename columns
+        df.rename({'element':'player_id'}, axis=1, inplace=True)
 
+        return df
+
+
+    def make_season_history_df(self):
+        '''Create dataframe with all players' past season summaries'''
+
+        tqdm.pandas()
+
+        # get gameweek histories for each player
+        df = pd.Series(self.players.index).progress_apply(
+            get_player_season_history)
+        # combine results into single dataframe
+        df = pd.concat(p for p in df)
         # rename columns
         df.rename({'element':'player_id'}, axis=1, inplace=True)
 

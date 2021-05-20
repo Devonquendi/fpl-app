@@ -22,7 +22,7 @@ class SelectionModel:
         '''
 
         # API data
-        api_data = FplApiData(team_id, gw-1)
+        api_data = FplApiData(team_id=team_id, gw=gw-1)
         # players
         self.players = api_data.players
         # position IDs, names and squad limits

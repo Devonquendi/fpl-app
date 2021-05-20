@@ -1,4 +1,4 @@
-id,name,short_name,strength,strength_overall_home,strength_overall_away,strength_attack_home,strength_attack_away,strength_defence_home,strength_defence_away
+team_id,team_name,short_name,strength,strength_overall_home,strength_overall_away,strength_attack_home,strength_attack_away,strength_defence_home,strength_defence_away
 1,Arsenal,ARS,4,1200,1250,1130,1150,1220,1210
 2,Aston Villa,AVL,3,1100,1160,1120,1140,1080,1100
 3,Brighton,BHA,3,1130,1130,1150,1190,1100,1130
