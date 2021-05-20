@@ -214,6 +214,7 @@ class SelectionModel:
             all_gw, name='ft', vartype=so.integer, lb=1, ub=2)
         penalized_transfers = model.add_variables(
             gameweeks, name='pt', vartype=so.integer, lb=0)
+        # artificial binary variable to handle transfer logic
         aux = model.add_variables(
             gameweeks, name='aux', vartype=so.binary)
         
@@ -324,7 +325,7 @@ class SelectionModel:
                 <= 3 for t in teams for w in gameweeks),
             name='team_limit')
         # Transfer constraints
-        # handles transfers in and out of squad
+        # squad is equal to squad from previous week, minus transfers out, plus in
         model.add_constraints(
             (
                 squad[p,w] == squad[p,w-1] + transfer_in[p,w] - transfer_out[p,w]
@@ -341,13 +342,13 @@ class SelectionModel:
         model.add_constraints(
             (free_transfers[w] == aux[w] + 1 for w in gameweeks),
             name='aux_ft_rel')
-        # no more than 2 free transfers per week ??
+        # no more than 2 free transfers per week
         model.add_constraints(
             (
                 free_transfers[w-1] - number_of_transfers[w-1] <= 2 * aux[w]
                 for w in gameweeks),
             name='force_aux_1')
-        # cannot make more than 14 paid transfers in a week ??
+        # cannot make more than 14 penalized transfers in a week
         model.add_constraints(
             (
                 free_transfers[w-1] - number_of_transfers[w-1] >= aux[w]
@@ -414,8 +415,10 @@ class SelectionModel:
         ).sort_values(
             by=['GW', 'lineup', 'Pos_id', 'xP'],
             ascending=[True, False, True, True])
-        total_xp = so.expr_sum((lineup[p,w] + captain[p,w]) * points_player_week[p,w]
-                            for p in players for w in gameweeks).get_value()
+        total_xp = so.expr_sum(
+            (lineup[p,w] + captain[p,w]) * points_player_week[p,w]
+            for p in players for w in gameweeks
+        ).get_value()
 
 
         print('SUMMARY OF ACTIONS', '-----------', sep='\n')
