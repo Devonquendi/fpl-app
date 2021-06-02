@@ -9,15 +9,20 @@ BASE_URL = 'https://fantasy.premierleague.com/api/'
 
 def get_player_gameweek_history(player_id, wait_time=.3):
     '''Get all gameweek info for a given player_id
-       wait between requests to avoid API rate limit'''
+       keep trying until response received from API'''
     
-    # send GET request to BASE_URL/api/element-summary/{PID}/
-    data = requests.get(
-            BASE_URL + 'element-summary/' + str(player_id) + '/').json()
+    success = False
+    while not success:
+        try:
+            # send GET request to BASE_URL/api/element-summary/{PID}/
+            data = requests.get(
+                BASE_URL + 'element-summary/' + str(player_id) + '/').json()
+            success = True
+        except:
+            time.sleep(wait_time)
+    
     # extract 'history' data from response into dataframe
     df = pd.json_normalize(data['history'])
-    # avoid getting rate limited
-    time.sleep(wait_time)
     
     return df
 
@@ -25,16 +30,20 @@ def get_player_gameweek_history(player_id, wait_time=.3):
 def get_player_season_history(player_id, wait_time=.3):
     '''Get all past season info for a given player_id,
        wait between requests to avoid API rate limit'''
+
+    success = False
+    while not success:
+        try:
+            # send GET request to BASE_URL/api/element-summary/{PID}/
+            data = requests.get(
+                BASE_URL + 'element-summary/' + str(player_id) + '/').json()
+            success = True
+        except:
+            time.sleep(wait_time)
     
-    # send GET request to
-    # fantasy.premierleague.com/api/element-summary/{PID}/
-    r = requests.get(
-        BASE_URL + 'element-summary/' + str(player_id) + '/').json()
     # extract 'history_past' data from response into dataframe
-    df = pd.json_normalize(r['history_past'])
+    df = pd.json_normalize(data['history_past'])
     df.insert(0, 'id', player_id)
-    # avoid getting rate limited
-    time.sleep(wait_time)
     
     return df
 
@@ -129,6 +138,7 @@ class FplApiData:
     def make_gameweek_history_df(self):
         '''Create dataframe with all players' inidividual gameweek scores'''
 
+        print('Getting player gameweek histories')
         tqdm.pandas()
 
         # get gameweek histories for each player
@@ -145,6 +155,7 @@ class FplApiData:
     def make_season_history_df(self):
         '''Create dataframe with all players' past season summaries'''
 
+        print('Getting player season histories')
         tqdm.pandas()
 
         # get gameweek histories for each player
@@ -177,5 +188,5 @@ if __name__ == '__main__':
     api_data.teams.to_csv(os.path.join(data_dir, 'teams.csv'))
     api_data.make_gameweek_history_df().to_csv(
         os.path.join(data_dir, 'gameweek_history.csv'), index=False)
-    api_data.make_gameweek_history_df().to_csv(
+    api_data.make_season_history_df().to_csv(
         os.path.join(data_dir, 'season_history.csv'), index=False)
