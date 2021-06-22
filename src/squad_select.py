@@ -444,7 +444,7 @@ if __name__ == '__main__':
 
     parser = ArgumentParser(
         description='Optimises squad selection for given time horizon')
-    parser.add_argument('-t', '--team_id', type=str, default=384484,
+    parser.add_argument('-t', '--team_id', type=str, default=269471,
                         help='unique ID of FPL manager')
     parser.add_argument('-w', '--gameweek', type=int, required=True,
                         help='upcoming gameweek number')
