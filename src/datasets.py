@@ -7,31 +7,12 @@ from tqdm.auto import tqdm
 BASE_URL = 'https://fantasy.premierleague.com/api/'
 
 
-def get_player_gameweek_history(player_id, wait_time=.3):
-    '''Get all gameweek info for a given player_id
-       keep trying until response received from API'''
-    
-    success = False
-    while not success:
-        try:
-            # send GET request to BASE_URL/api/element-summary/{PID}/
-            data = requests.get(
-                BASE_URL + 'element-summary/' + str(player_id) + '/').json()
-            success = True
-        except:
-            time.sleep(wait_time)
-    
-    # extract 'history' data from response into dataframe
-    df = pd.json_normalize(data['history'])
-    
-    return df
-
-
-def get_player_season_history(player_id, wait_time=.3):
+def get_player_history(player_id, type):
     '''Get all past season info for a given player_id,
        wait between requests to avoid API rate limit'''
 
     success = False
+    # try until a result is returned
     while not success:
         try:
             # send GET request to BASE_URL/api/element-summary/{PID}/
@@ -39,11 +20,15 @@ def get_player_season_history(player_id, wait_time=.3):
                 BASE_URL + 'element-summary/' + str(player_id) + '/').json()
             success = True
         except:
-            time.sleep(wait_time)
+            # wait a bit to avoid API rate limits, if needed
+            time.sleep(.3)
     
     # extract 'history_past' data from response into dataframe
-    df = pd.json_normalize(data['history_past'])
-    df.insert(0, 'id', player_id)
+    df = pd.json_normalize(data[type])
+
+    # season history needs player id column added
+    if type == 'history_past':
+        df.insert(0, 'id', player_id)
     
     return df
 
@@ -104,6 +89,7 @@ class FplApiData:
 
     
     def make_opt_df(self, forecasts_file):
+        '''Create dataframe with player info and upcoming projections'''
 
         forecasts = pd.read_csv(forecasts_file)
         # rename columns to match api data
@@ -116,16 +102,20 @@ class FplApiData:
         forecasts['position_name'].replace(
             {'G':'GKP', 'D':'DEF', 'M':'MID', 'F':'FWD'}, inplace=True)
 
+        # player info
         df = self.players[
             ['web_name', 'position_id', 'team_id', 'now_cost']
+        # join team names
         ].reset_index().merge(
             self.teams[
                 ['team_name']],
             on='team_id'
+        # join position names
         ).merge(
             self.positions[
                 ['position_name']],
             on='position_id'
+        # join forecasts
         ).merge(
             forecasts, on=['team_name', 'web_name', 'position_name']
         )
@@ -135,32 +125,15 @@ class FplApiData:
         return df
 
 
-    def make_gameweek_history_df(self):
-        '''Create dataframe with all players' inidividual gameweek scores'''
+    def make_history_df(self, type):
+        '''Create dataframe with all players' gameweek or season histories'''
 
-        print('Getting player gameweek histories')
+        print(f'Creating player {type} dataframe')
         tqdm.pandas()
 
-        # get gameweek histories for each player
+        # get histories for each player
         df = pd.Series(self.players.index).progress_apply(
-            get_player_gameweek_history)
-        # combine results into single dataframe
-        df = pd.concat(p for p in df)
-        # rename columns
-        df.rename({'element':'player_id'}, axis=1, inplace=True)
-
-        return df
-
-
-    def make_season_history_df(self):
-        '''Create dataframe with all players' past season summaries'''
-
-        print('Getting player season histories')
-        tqdm.pandas()
-
-        # get gameweek histories for each player
-        df = pd.Series(self.players.index).progress_apply(
-            get_player_season_history)
+            get_player_history, type=type)
         # combine results into single dataframe
         df = pd.concat(p for p in df)
         # rename columns
@@ -173,20 +146,28 @@ if __name__ == '__main__':
 
     parser = ArgumentParser(description='Downloads all datasets from FPL API')
     parser.add_argument('-o', '--output_dir', 
-                        default=os.path.join('..', 'data', '2020-21'),
+                        default=os.path.join('..', 'data', '2021-22'),
                         help='relative path to output folder', type=str)
     args = parser.parse_args()
 
     # make sure using correct separators for path names
     data_dir = args.output_dir.replace('/', os.sep)
+
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
     
     # get all data from API
     api_data = FplApiData()
     # save all dataframes as CSVs in chosen folder
+    # players
     api_data.players.to_csv(os.path.join(data_dir, 'players.csv'))
+    # positions
     api_data.positions.to_csv(os.path.join(data_dir, 'positions.csv'))
+    # teams
     api_data.teams.to_csv(os.path.join(data_dir, 'teams.csv'))
-    api_data.make_gameweek_history_df().to_csv(
+    # gameweek histories
+    api_data.make_history_df(type='history').to_csv(
         os.path.join(data_dir, 'gameweek_history.csv'), index=False)
-    api_data.make_season_history_df().to_csv(
+    # season histories
+    api_data.make_history_df(type='history_past').to_csv(
         os.path.join(data_dir, 'season_history.csv'), index=False)
