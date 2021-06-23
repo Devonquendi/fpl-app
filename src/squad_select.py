@@ -169,7 +169,6 @@ class SelectionModel:
         #       compare your own team outcomes with the optimal squad
         #       useful for deciding when to wildcard
         # ToDo: add parameter for helping to decide on when to use bench boost
-        # ToDo: add constraint description comments
         '''
         Solves multi-objective FPL problem with transfers
         Parameters

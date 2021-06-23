@@ -108,12 +108,12 @@ class FplApiData:
         # join team names
         ].reset_index().merge(
             self.teams[
-                ['team_name']],
+                ['team_id', 'team_name']],
             on='team_id'
         # join position names
         ).merge(
             self.positions[
-                ['position_name']],
+                ['position_id', 'position_name']],
             on='position_id'
         # join forecasts
         ).merge(
