@@ -108,12 +108,12 @@ class FplApiData:
         # join team names
         ].reset_index().merge(
             self.teams[
-                ['team_id', 'team_name']],
+                ['team_name']],
             on='team_id'
         # join position names
         ).merge(
             self.positions[
-                ['position_id', 'position_name']],
+                ['position_name']],
             on='position_id'
         # join forecasts
         ).merge(
@@ -156,7 +156,7 @@ if __name__ == '__main__':
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
     
-    # get all data from API
+    # load all data from API into memory
     api_data = FplApiData()
     # save all dataframes as CSVs in chosen folder
     # players

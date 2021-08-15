@@ -454,7 +454,7 @@ if __name__ == '__main__':
     parser.add_argument('-hz', '--horizon', type=int, default=2,
                         help='number of weeks to look forward')
     parser.add_argument('-d', '--decay', type=float, default=1.0,
-                        help='number of weeks to look forward')
+                        help='future uncertainty decay parameter')
 
     args = parser.parse_args()
 
