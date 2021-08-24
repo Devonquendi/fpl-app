@@ -1,7 +1,7 @@
 import pandas as pd
 import sasoptpy as so
 import os
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from subprocess import Popen, DEVNULL
 from datasets import FplApiData
 
@@ -442,19 +442,24 @@ class SelectionModel:
 if __name__ == '__main__':
 
     parser = ArgumentParser(
-        description='Optimises squad selection for given time horizon')
-    parser.add_argument('-t', '--team_id', type=str, default=269471,
-                        help='unique ID of FPL manager')
-    parser.add_argument('-w', '--gameweek', type=int, required=True,
-                        help='upcoming gameweek number')
-    parser.add_argument('-f', '--forecasts', type=str, required=True,
-                        help='path to FPLreview forecasts file')
-    parser.add_argument('-ft', '--free_transfers', type=int, default=1,
-                        help='number of free transfers for upcoming week')
-    parser.add_argument('-hz', '--horizon', type=int, default=2,
-                        help='number of weeks to look forward')
-    parser.add_argument('-d', '--decay', type=float, default=1.0,
-                        help='future uncertainty decay parameter')
+        description='Optimises squad selection for given time horizon',
+        formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-t', type=str, default=269471,
+                        help='unique ID of FPL manager', dest='team_id')
+    parser.add_argument('-w', type=int, required=True,
+                        help='upcoming gameweek number', dest='gameweek')
+    parser.add_argument('-f', type=str, required=True,
+                        help='path to FPLreview forecasts file',
+                        dest='forecasts')
+    parser.add_argument('-ft', type=int, default=1,
+                        help='number of free transfers for upcoming week',
+                        dest='free_transfers')
+    parser.add_argument('-hz', type=int, default=5,
+                        help='number of weeks to look forward',
+                        dest='horizon')
+    parser.add_argument('-ud', type=float, default=1.0,
+                        help='future uncertainty decay parameter',
+                        dest='uncertainty')
 
     args = parser.parse_args()
 
@@ -466,7 +471,7 @@ if __name__ == '__main__':
 
     print('OPTIMIZING ACTION PLAN')
     picks = model.solve_multi_week(
-        ft=args.free_transfers, horizon=args.horizon, decay_base=args.decay)
+        ft=args.free_transfers, horizon=args.horizon, decay_base=args.uncertainty)
     print('\nSQUAD PICKS:')
     print(picks)
     print('\n\nFINDING OPTIMAL SQUAD FOR UPCOMING WEEK')
