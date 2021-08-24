@@ -7,6 +7,71 @@ Data-driven decision making tool for [Fantasy Premier League](https://fantasy.pr
 
 ## Getting started
 
+### 1. Navigate to **`src`** folder and activate ipython console:
+```bash
+cd src
+ipython
+```
+
+### 2. Download latest data from FPL API:
+```bash
+# Get help with the datasets script
+run datasets.py -h
+```
+
+```console
+>>>
+usage: datasets.py [-h] [-o Output folder]
+
+Downloads all datasets from FPL API
+
+optional arguments:
+  -h, --help        show this help message and exit
+  -o Output folder  relative path to output folder (default: ..\data\2021-22)
+```
+
+```bash
+# run datasets.py and save output into default location
+run datasets.py
+```
+
+### 3. Run team optimizer
+```bash
+# Get help with the squad_select script
+run squad_select.py -h
+```
+
+```console
+>>>
+usage: squad_select.py [-h] [-t Team ID] -w Gameweek -f Forecasts
+                       [-ft Free transfers] [-hz Horizon] [-d Uncertainty]
+
+Optimises squad selection for given time horizon
+
+optional arguments:
+  -h, --help          show this help message and exit
+  -t Team ID          unique ID of FPL manager (default: 269471)
+  -w Gameweek         upcoming gameweek number (default: None)
+  -f Forecasts        path to FPLreview forecasts file (default: None)
+  -ft Free transfers  number of free transfers for upcoming week (default: 1)
+  -hz Horizon         number of weeks to look forward (default: 5)
+  -ud Uncertainty     future uncertainty decay parameter (default: 1.0)
+```
+
+```bash
+# run squad_select.py
+run squad_select.py -t 269471 -w 3 -f ../data/fplreview/GW3.csv -ud 0.5
+```
+
+
+### Get help with a script:
+```bash
+run squad_select.py
+
+Download the latest data from FPL API
+
+## Interacting with the FPL API
+
 Get a list of the fields availabe at the `bootstrap-static` endpoint:
 ```python
 import requests, json
