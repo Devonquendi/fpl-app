@@ -7,6 +7,12 @@ Data-driven decision making tool for [Fantasy Premier League](https://fantasy.pr
 
 ## Getting started
 
+### 0. Create virtual environment and activate it:
+```bash
+conda env create -f environment.yml
+conda activate fpl
+```
+
 ### 1. Navigate to **`src`** folder and activate ipython console:
 ```bash
 cd src
@@ -59,20 +65,17 @@ optional arguments:
 ```
 
 ```bash
-# run squad_select.py
+# run squad_select.py for the following:
+# - team ID 269471
+# - gameweek 3
+# - GW3.csv player points forecasts
+# - uncertainty decay param = 0.5
 run squad_select.py -t 269471 -w 3 -f ../data/fplreview/GW3.csv -ud 0.5
 ```
-
-
-### Get help with a script:
-```bash
-run squad_select.py
-
-Download the latest data from FPL API
-
+---
 ## Interacting with the FPL API
 
-Get a list of the fields availabe at the `bootstrap-static` endpoint:
+### Get a list of the fields available at the `bootstrap-static` endpoint:
 ```python
 import requests, json
 import pandas as pd
