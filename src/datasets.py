@@ -146,7 +146,7 @@ if __name__ == '__main__':
 
     parser = ArgumentParser(description='Downloads all datasets from FPL API',
                             formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-o', default=os.path.join('..', 'data', '2021-22'),
+    parser.add_argument('-o', default=os.path.join('..', 'data', '2022-23'),
                         help='relative path to output folder', type=str,
                         dest='output_dir', metavar='Output folder')
     args = parser.parse_args()
