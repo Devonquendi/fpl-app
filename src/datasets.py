@@ -54,6 +54,12 @@ class FplApiData:
                                      'team':'team_id',
                                      'element_type':'position_id'},
                             inplace=True)
+        # some fields are returned as strings by the api
+        self.players = self.players.astype(dtype={'points_per_game': 'float64',
+                                                  'influence': 'float64',
+                                                  'creativity': 'float64',
+                                                  'threat': 'float64',
+                                                  'ict_index': 'float64'})
         self.players.set_index(['player_id'], inplace=True)
         # position data
         self.positions = pd.DataFrame(api_data['element_types'])
