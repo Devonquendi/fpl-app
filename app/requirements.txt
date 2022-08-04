@@ -1,5 +1,4 @@
-pandas
-tqdm
 matplotlib
+pandas
 seaborn
 streamlit
