@@ -42,6 +42,6 @@ st.write(df.style.format(subset=float_cols, formatter='{:.1f}'))
 
 # scatter plot
 c = alt.Chart(df).mark_circle().encode(
-    x='II', y='Pts/GP', size='£', color='pos', tooltip=['name', 'Pts'])
+    x='II/GP', y='Pts/GP', size='£', color='pos', tooltip=['name', 'Pts'])
 
 st.altair_chart(c, use_container_width=True)
