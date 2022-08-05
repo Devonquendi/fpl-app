@@ -9,7 +9,7 @@ from load_data import FplData
 st.set_page_config(page_title='FPL dashboard', page_icon='⚽', layout='wide')
 
 # load data from github
-with st.spinner('Loading data from GitHub'):
+with st.spinner():
     fpl_data = FplData()
     st.session_state['summary'] = fpl_data.get_summary()
     st.session_state['data'] = fpl_data
