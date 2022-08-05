@@ -4,14 +4,15 @@ import streamlit as st
 
 data_url = 'https://raw.githubusercontent.com/datahounds/fantasy-premier-league/master/data/2021-22/'
 
-# @st.cache
+
+@st.cache
 class FplData:
     
-    # @st.cache
     def __init__(self):
         '''Loads all saved FPL API data from GitHub'''
 
         players = pd.read_csv(data_url + 'players.csv')
+        players = players[players['minutes'] > 270]
         positions = pd.read_csv(data_url + 'positions.csv')
         teams = pd.read_csv(data_url + 'teams.csv')
         history = pd.read_csv(data_url + 'gameweek_history.csv')
@@ -39,7 +40,7 @@ class FplData:
                     'GS', 'A', 'CS', 'GC', 'OG', 'PS', 'B', 'BPS', 'I', 'C', 'T', 'II', '£', 'TSB', 'NT']
 
         # convert price to in-game values
-        history['£'] = history['£'] / 10
+        history['£'] = (history['£'] / 10).round(1)
 
         # create game_played column
         history['GP'] = history['MP'] > 0
@@ -47,7 +48,7 @@ class FplData:
         self.players = players
         self.history = history
 
-    @st.cache
+    # @st.cache
     def get_summary(self):
         '''Create dataframe with player season summaries'''
 
@@ -61,10 +62,10 @@ class FplData:
         df = df[df['MP']>270]
 
         # add "per 90" metrics
-        df[['Pts/90', 'I/90', 'C/90', 'T/90', 'II/90']] = df[['Pts', 'I', 'C', 'T', 'II']].divide(df['MP'] / 90, axis=0)
+        df[['Pts/90', 'I/90', 'C/90', 'T/90', 'II/90']] = df[['Pts', 'I', 'C', 'T', 'II']].divide(df['MP'] / 90, axis=0).round(1)
         # add "per game" metrics
-        df[['Pts/GP', 'I/GP', 'C/GP', 'T/GP', 'II/GP']] = df[['Pts', 'I', 'C', 'T', 'II']].divide(df['GP'], axis=0)
+        df[['Pts/GP', 'I/GP', 'C/GP', 'T/GP', 'II/GP']] = df[['Pts', 'I', 'C', 'T', 'II']].divide(df['GP'], axis=0).round(1)
 
         df.sort_values('Pts/GP', ascending=False, inplace=True)
 
-        return df
+        return df.round(1)
