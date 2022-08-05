@@ -51,7 +51,10 @@ if position_select:
     df_90 = df_90[pos_filter]
     df_gp = df_gp[pos_filter]
 if price_max:
-    df = df[df['£'] <= price_max]
+    price_filter = df['£'] <= price_max
+    df = df[price_filter]
+    df_90 = df_90[price_filter]
+    df_gp = df_gp[price_filter]
 
 # --------------------------------------------------------------- main container
 # ---------------------------------------------------- dataframes
