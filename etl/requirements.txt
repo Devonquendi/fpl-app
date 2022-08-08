@@ -1,0 +1,6 @@
+requests
+numpy
+pandas
+tqdm
+dnspython
+pymongo
