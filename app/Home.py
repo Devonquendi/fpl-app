@@ -60,11 +60,6 @@ if price_max:
 # ---------------------------------------------------- dataframes
 st.header('Player summary')
 
-# info_cols = ['name', 'team', 'pos', '£', 'GP', 'MP']
-# score_total_cols = ['Pts', 'GS', 'A', 'CS', 'B', 'BPS', 'I', 'C', 'T', 'II']
-# score_90_cols = [c + '/90' for c in score_total_cols]
-# score_gp_cols = [c + '/GP' for c in score_total_cols]
-
 st.subheader('Season totals')
 display_frame(df)
 
