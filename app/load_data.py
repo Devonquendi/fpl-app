@@ -177,10 +177,14 @@ class FplElementsData:
                       'RC', 'S', 'B', 'BPS', 'I', 'C', 'T', 'II']
         # add "per 90" metrics
         df_90 = df.copy()
-        df_90[score_cols] = df_90[score_cols].divide(df_90['MP'] / 90, axis=0)
+        df_90[score_cols] = df_90[score_cols].divide(
+            df_90['MP'] / 90, axis=0
+        ).fillna(0).replace(np.inf, 0)
         # add "per game" metrics
         df_gp = df.copy()
-        df_gp[score_cols] = df_gp[score_cols].divide(df_gp['GP'], axis=0)
+        df_gp[score_cols] = df_gp[score_cols].divide(
+            df_gp['GP'], axis=0
+        ).fillna(0).replace(np.inf, 0)
 
         self.teams = teams
         self.positions = positions
@@ -191,42 +195,24 @@ class FplElementsData:
 
 
 class FplManagerData:
-    '''Get all past season info for a given player_id,
-    wait between requests to avoid API rate limit'''
-
-    success = False
-    # try until a result is returned
-    while not success:
-        try:
-            # send GET request to BASE_URL/api/element-summary/{PID}/
-            data = requests.get(
-                BASE_URL + 'element-summary/' + str(player_id) + '/').json()
-            success = True
-        except:
-            # wait a bit to avoid API rate limits, if needed
-            time.sleep(.3)
     
-    # extract 'history' data from response into dataframe
-    df = pd.json_normalize(data[type])
-    print(df)
+    def __init__(self, manager_id, gw):
+        '''Loads all manager data from API'''
 
-    # season history needs player id column added
-    if type == 'history_past' and not df.empty:
-        df = df.drop('element_code', axis=1)
-        df.insert(0, 'element', player_id)
+        # get all data from fpl api
+        info = requests.get(f'{BASE_URL}entry/{manager_id}/').json()
+        history = requests.get(f'{BASE_URL}entry/{manager_id}/history/').json()
 
-    if type == 'history':
-        # select columns
-        df = df.rename(columns=COLUMN_RENAME_LIST | {
-            'element': 'player_id',
-            'season_name': 'season',
-            'start_cost': '£S',
-            'end_cost': '£E'
-        }).astype({
-                'I': 'float64',
-                'C': 'float64',
-                'T': 'float64',
-                'II': 'float64'})
+        # squad from previous gameweek
+        picks = pd.DataFrame(
+            requests.get(
+                f'{BASE_URL}entry/{manager_id}/event/{gw}/picks/'
+            ).json()['picks']
+        ).rename(columns={
+            'element': 'player_id'}
+        ).drop(
+            'position', axis=1
+        )
 
-    return df.round(1)
+        self.picks = picks
 

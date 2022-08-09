@@ -4,7 +4,8 @@ import streamlit as st
 from load_data import get_player_history
 
 
-st.set_page_config(page_title='FPL Player Details', page_icon='👕', layout='wide')
+st.set_page_config(
+    page_title='FPL Player Details', page_icon='👕', layout='wide')
 
 df = st.session_state['data'].df_total
 df_90 = st.session_state['data'].df_90

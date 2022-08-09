@@ -4,15 +4,11 @@ import pandas as pd
 import streamlit as st
 
 from load_data import FplElementsData
+from st_helpers import display_frame
 
 
-def display_frame(df):
-    '''display dataframe with all float columns rounded to 1 decimal place'''
-    float_cols = df.select_dtypes(include='float64').columns.values
-    st.dataframe(df.style.format(subset=float_cols, formatter='{:.1f}'))
-
-
-st.set_page_config(page_title='FPL dashboard', page_icon='⚽', layout='wide')
+st.set_page_config(
+    page_title='FPL dashboard', page_icon='⚽', layout='wide')
 
 # load data from github
 with st.spinner():
@@ -24,10 +20,6 @@ df_90 = st.session_state['data'].df_90
 df_gp = st.session_state['data'].df_gp
 
 # --------------------------------------------------------------------- side bar
-# user id input
-st.sidebar.text_input('Your FPL ID', key='fpl_id')
-st.sidebar.write('Your team id:', st.session_state.fpl_id)
-
 position_select = st.sidebar.multiselect(
     'Position',
     df['pos'].unique()
