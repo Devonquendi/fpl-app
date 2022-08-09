@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-from load_data import FplElementsData
+from load_data import FplApiData
 from st_helpers import display_frame
 
 
@@ -14,11 +14,12 @@ st.markdown('''
     #### To Do
       * Scrape data from FBRef and Understat
       * Player points predictions
-      * Upcoming fixture difficulties (who has easy/hard schedules?)''')
+      * Upcoming fixture difficulties (who has easy/hard schedules?)
+      * Differential picks''')
 
 # load data from API
 with st.spinner():
-    fpl_data = FplElementsData()
+    fpl_data = FplApiData()
     st.session_state['data'] = fpl_data
 
 df = st.session_state['data'].df_total
