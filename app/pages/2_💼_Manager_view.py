@@ -42,5 +42,5 @@ picks.drop(
 
 # ------------------------------------------------------------------- main panel
 st.subheader('Manager information')
-st.subheader('Last weeks\' team')
+st.subheader('Last week\'s team')
 display_frame(picks)
