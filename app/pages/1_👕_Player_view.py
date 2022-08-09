@@ -1,6 +1,8 @@
 import numpy as np
 import streamlit as st
 
+from load_data import get_player_history
+
 
 st.set_page_config(page_title='FPL Player Details', page_icon='👕', layout='wide')
 
@@ -8,7 +10,7 @@ df = st.session_state['data'].df_total
 df_90 = st.session_state['data'].df_90
 df_gp = st.session_state['data'].df_gp
 
-# -------------------------------------------------------------------- side bar
+# --------------------------------------------------------------------- side bar
 # position slicer
 position_select = st.sidebar.multiselect(
     'Position',
@@ -35,18 +37,16 @@ player_select = st.sidebar.radio(
     'Player',
     df['name'].unique()
 )
+selected_player_df = df[df['name']==player_select]
+selected_player_id = df[df['name']==player_select]['player_id'].tolist()[0]
+selected_player_history = get_player_history(selected_player_id, type='history')
+selected_player_history_past = get_player_history(selected_player_id, type='history_past')
 
-# -------------------------------------------------------------------- metrics
-df
-gs_pos_avg = df['GS'].mean().round(2)
-st.write(gs_pos_avg)
-
-player_stats = df[df['name']==player_select]
-gs_player = player_stats.iloc[0]['GS']
-
-st.write(player_stats)
-st.write(gs_player)
-
-st.metric('Goals scored', gs_player, delta=f'{gs_player-gs_pos_avg:.2f}')
-
-df[df['name']==player_select]
+# --------------------------------------------------------------- main container
+st.header('Player summary')
+st.subheader('Season totals')
+selected_player_df
+st.subheader('Gameweek history')
+selected_player_history
+st.subheader('Season history')
+selected_player_history_past

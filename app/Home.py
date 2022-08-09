@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-from load_data import FplData
+from load_data import FplElementsData
 
 
 def display_frame(df):
@@ -16,14 +16,14 @@ st.set_page_config(page_title='FPL dashboard', page_icon='⚽', layout='wide')
 
 # load data from github
 with st.spinner():
-    fpl_data = FplData()
+    fpl_data = FplElementsData()
     st.session_state['data'] = fpl_data
 
 df = st.session_state['data'].df_total
 df_90 = st.session_state['data'].df_90
 df_gp = st.session_state['data'].df_gp
 
-# -------------------------------------------------------------------- side bar
+# --------------------------------------------------------------------- side bar
 # user id input
 st.sidebar.text_input('Your FPL ID', key='fpl_id')
 st.sidebar.write('Your team id:', st.session_state.fpl_id)
@@ -58,17 +58,16 @@ if price_max:
 
 # --------------------------------------------------------------- main container
 # ---------------------------------------------------- dataframes
-st.header('Player summary')
+st.header('Players summary')
 
 st.subheader('Season totals')
 display_frame(df)
 
-st.subheader('Totals per 90 minutes')
-display_frame(df_90)
-
 st.subheader('Totals per game played')
 display_frame(df_gp)
 
+st.subheader('Totals per 90 minutes')
+display_frame(df_90)
 # ------------------------------------------------- scatter plots
 scatter_x_var = st.selectbox(
     'X axis variable',
@@ -80,8 +79,8 @@ scatter_lookup = {
 
 col1, col2 = st.columns(2)
 with col1:
-    st.header('Points per 90')
-    c = alt.Chart(df_90).mark_circle(size=75).encode(
+    st.header('Points per game played')
+    c = alt.Chart(df_gp).mark_circle(size=75).encode(
         x=scatter_lookup[scatter_x_var],
         y='Pts',
         color='pos',
@@ -89,8 +88,8 @@ with col1:
     )
     st.altair_chart(c, use_container_width=True)
 with col2:
-    st.header('Points per game played')
-    c = alt.Chart(df_gp).mark_circle(size=75).encode(
+    st.header('Points per 90')
+    c = alt.Chart(df_90).mark_circle(size=75).encode(
         x=scatter_lookup[scatter_x_var],
         y='Pts',
         color='pos',
