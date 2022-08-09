@@ -1,7 +1,8 @@
 import numpy as np
+import pandas as pd
 import streamlit as st
 
-from load_data import get_player_history
+from st_helpers import display_frame
 
 
 st.set_page_config(
@@ -13,8 +14,13 @@ st.markdown('''
       * Weekly Pts chart
       * Weekly ICT chart
       * Nearest neighbours analysis to show "similar players"
-      * Add total points and cost to player select in sidebar''')
+      * Add total points and cost to player select in sidebar
+      * Show player performance vs opposition strength ("fixture-proof" players)''')
 
+fpl_data = st.session_state['data']
+players = st.session_state['data'].players
+positions = st.session_state['data'].positions
+teams = st.session_state['data'].teams
 df = st.session_state['data'].df_total
 df_90 = st.session_state['data'].df_90
 df_gp = st.session_state['data'].df_gp
@@ -46,16 +52,38 @@ player_select = st.sidebar.radio(
     'Player',
     df['name'].unique()
 )
-selected_player_df = df[df['name']==player_select]
-selected_player_id = df[df['name']==player_select]['player_id'].tolist()[0]
-selected_player_history = get_player_history(selected_player_id, type='history')
-selected_player_history_past = get_player_history(selected_player_id, type='history_past')
+selected_player_id = df[df['name']==player_select].index.tolist()[0]
+player_history, player_history_past = fpl_data.get_player_summary(
+    selected_player_id)
 
 # --------------------------------------------------------------- main container
+player_info = players.loc[selected_player_id].to_dict()
+player_name = player_info['first_name'] + ' ' + player_info['second_name']
+player_pos = player_info['pos_name_long']
+player_team = player_info['team_name_long']
+
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.header(player_name)
+with col2:
+    st.header(player_pos)
+with col3:
+    st.header(player_team)
+
 st.header('Player summary')
+# ------------------------------------ metrics
 st.subheader('Season totals')
-selected_player_df
+player_totals = df.loc[selected_player_id].to_dict()
+
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.metric(label='Points scored', value=player_totals['Pts'])
+with col2:
+    st.metric(label='Price', value=f"£{player_totals['£']}")
+with col3:
+    st.metric(label='TSB', value=f"{player_totals['TSB%']}%")
+
 st.subheader('Gameweek history')
-selected_player_history
+display_frame(player_history.drop(['OPP_strength', 'OPP_ovr', 'OPP_att', 'OPP_def'], axis=1))
 st.subheader('Season history')
-selected_player_history_past
+display_frame(player_history_past)
