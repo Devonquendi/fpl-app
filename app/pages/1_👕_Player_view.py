@@ -7,6 +7,14 @@ from load_data import get_player_history
 st.set_page_config(
     page_title='FPL Player Details', page_icon='👕', layout='wide')
 
+st.markdown('''
+    #### To Do
+      * Use metric elements to show per game statistics compared to overall position average
+      * Weekly Pts chart
+      * Weekly ICT chart
+      * Nearest neighbours analysis to show "similar players"
+      * Add total points and cost to player select in sidebar''')
+
 df = st.session_state['data'].df_total
 df_90 = st.session_state['data'].df_90
 df_gp = st.session_state['data'].df_gp

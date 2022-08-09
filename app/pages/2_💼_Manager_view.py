@@ -9,6 +9,15 @@ from st_helpers import display_frame
 st.set_page_config(
     page_title='FPL Manager Details', page_icon='💼', layout='wide')
 
+st.markdown('''
+    #### To Do
+      * Team name
+      * Mini league ranks
+      * Current / previous seasons' rank
+      * Weekly scores
+      * Your top performers
+      * Top performing players **NOT** in your team''')
+
 df = st.session_state['data'].df_total
 df_90 = st.session_state['data'].df_90
 df_gp = st.session_state['data'].df_gp
@@ -32,5 +41,6 @@ picks.drop(
     ['multiplier', 'is_captain', 'is_vice_captain'], axis=1, inplace=True)
 
 # ------------------------------------------------------------------- main panel
-st.subheader('Your team')
+st.subheader('Manager information')
+st.subheader('Last weeks\' team')
 display_frame(picks)
