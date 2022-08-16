@@ -45,7 +45,25 @@ class FplApiData:
         # get all data from fpl api
         api_data = requests.get(BASE_URL+'bootstrap-static/').json()
 
-        # get position data
+        # ---------------------------------------------------------------- gameweeks
+        gameweeks = pd.json_normalize(
+            api_data['events']
+        ).drop(
+            ['chip_plays', 'top_element', 'top_element_info', 'deadline_time_epoch',
+             'deadline_time_game_offset', 'cup_leagues_created', 'h2h_ko_matches_created'],
+            axis=1
+        ).rename(columns={
+            'id': 'GW',
+            'average_entry_score': 'average_manager_points',
+            'highest_scoring_entry': 'top_manager_id',
+            'highest_score': 'top_manager_score',
+            'top_element_info.id': 'top_player_id',
+            'top_element_info.points': 'top_player_points'}
+        ).set_index(
+            'GW'
+        )
+
+        # ---------------------------------------------------------------- positions
         positions = pd.DataFrame(
             api_data['element_types']
         ).drop(
@@ -61,7 +79,7 @@ class FplApiData:
             'position_id'
         )
 
-        # get team data
+        # -------------------------------------------------------------------- teams
         teams = pd.DataFrame(
             api_data['teams']
         ).drop(
@@ -76,7 +94,7 @@ class FplApiData:
             'team_id'
         )
 
-        # get player data
+        # ------------------------------------------------------------------ players
         players = pd.DataFrame(
             api_data['elements'])[[
                 'id', 'first_name', 'second_name', 'web_name', 'team', 'element_type',
@@ -132,6 +150,7 @@ class FplApiData:
             df_gp['GP'], axis=0
         ).fillna(0).replace(np.inf, 0)
 
+        self.gameweeks = gameweeks
         self.teams = teams
         self.positions = positions
         self.players = players
@@ -238,25 +257,50 @@ class FplApiData:
         # get all data from fpl api
         data = requests.get(BASE_URL+'fixtures/').json()
 
-        fixtures = pd.DataFrame(
+        team_names = self.teams[['team']]
+
+        fixtures = pd.json_normalize(
             data
+        ).merge(
+            team_names,
+            left_on='team_h',
+            right_on='team_id',
+            suffixes=[None, '_home']
+        ).merge(
+            team_names,
+            left_on='team_a',
+            right_on='team_id',
+            suffixes=[None, '_away']
+        ).rename(columns={
+            'id': 'fixture_id',
+            'event': 'GW',
+            'team': 'team_home'}
+        ).drop(
+            ['code', 'finished_provisional', 'kickoff_time', 'minutes', 'provisional_start_time',
+            'started', 'stats', 'pulse_id'],
+            axis=1
         )
-        # .drop(
-        #     ['code', 'played', 'form', 'win', 'draw', 'loss', 'points',
-        #      'position', 'team_division', 'unavailable', 'pulse_id'],
-        #     axis=1
-        # ).rename(columns={
-        #     'id': 'team_id',
-        #     'short_name': 'team',
-        #     'name': 'team_name_long'}
-        # ).set_index(
-        #     'team_id'
-        # )
 
-        return fixtures
+        home_team_ids = fixtures.pivot(
+            index='team_h', columns='GW', values='team_a').fillna(0)
+        away_team_ids = fixtures.pivot(
+            index='team_a', columns='GW', values='team_h').fillna(0)
 
+        home_ratings = fixtures.pivot(
+            index='team_h', columns='GW', values='team_h_difficulty').fillna(0)
+        away_ratings = fixtures.pivot(
+            index='team_a', columns='GW', values='team_a_difficulty').fillna(0)
 
+        home_team_names = fixtures.pivot(
+            index='team_home', columns='GW', values='team_away').fillna('')
+        away_team_names = fixtures.pivot(
+            index='team_away', columns='GW', values='team_home').fillna('')
+        
+        fixture_ratings = home_ratings + away_ratings
+        fixture_team_ids = home_team_ids + away_team_ids
+        fixture_team_names = home_team_names + away_team_names
 
+        return fixture_ratings, fixture_team_ids, fixture_team_names
 
 
 class FplManagerData:
