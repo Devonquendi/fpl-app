@@ -14,9 +14,16 @@ st.markdown('''
       * Sort rows in order of easiest to hardest schedules''')
 
 fpl_data = st.session_state['data']
+gameweeks = st.session_state['data'].gameweeks
 teams = st.session_state['data'].teams
 
-teams
+fixture_ratings, fixture_team_ids, fixture_team_names = fpl_data.get_fixtures()
 
-fixtures = fpl_data.get_fixtures()
-fixtures
+st.subheader('Teams')
+teams
+st.subheader('Gameweeks')
+gameweeks
+st.subheader('Fixtures')
+fixture_ratings
+fixture_team_ids
+fixture_team_names
