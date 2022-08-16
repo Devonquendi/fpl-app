@@ -232,6 +232,33 @@ class FplApiData:
         return gameweek_history, season_history
 
 
+    def get_fixtures(self):
+        '''Get all fixtures'''
+
+        # get all data from fpl api
+        data = requests.get(BASE_URL+'fixtures/').json()
+
+        fixtures = pd.DataFrame(
+            data
+        )
+        # .drop(
+        #     ['code', 'played', 'form', 'win', 'draw', 'loss', 'points',
+        #      'position', 'team_division', 'unavailable', 'pulse_id'],
+        #     axis=1
+        # ).rename(columns={
+        #     'id': 'team_id',
+        #     'short_name': 'team',
+        #     'name': 'team_name_long'}
+        # ).set_index(
+        #     'team_id'
+        # )
+
+        return fixtures
+
+
+
+
+
 class FplManagerData:
     
     def __init__(self, manager_id, gw):
