@@ -190,7 +190,7 @@ class FplApiData:
                 ~s['was_home'] * s['strength_attack_home'],
             OPP_def=lambda s: s['was_home'] * s['strength_defence_away'] + \
                 ~s['was_home'] * s['strength_defence_home'],
-            GP=lambda s: int(s['MP'] > 0)
+            GP=lambda s: s['MP'] > 0
         )
         # add OPP column with team name, home/away status and score
         gameweek_history['OPP'] = gameweek_history.apply(
@@ -199,8 +199,8 @@ class FplApiData:
 
         gameweek_history = gameweek_history[[
             'GW', 'OPP', 'OPP_strength', 'OPP_ovr', 'OPP_att', 'OPP_def', 'Pts',
-            'MP', 'GS', 'A', 'CS', 'GC', 'OG', 'PS', 'PM', 'YC', 'RC', 'S', 'B',
-            'BPS', 'I', 'C', 'T', 'II', 'NT', 'SB', '£'
+            'MP', 'GP', 'GS', 'A', 'CS', 'GC', 'OG', 'PS', 'PM', 'YC', 'RC', 'S',
+            'B', 'BPS', 'I', 'C', 'T', 'II', 'NT', 'SB', '£'
         ]]
 
         # ------------------------------------------------------- season history
