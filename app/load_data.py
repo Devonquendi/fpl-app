@@ -251,8 +251,8 @@ class FplApiData:
         return gameweek_history, season_history
 
 
-    def get_fixtures(self):
-        '''Get all fixtures'''
+    def get_fixtures(self, start_gw=None, end_gw=None):
+        '''Get all fixtures in range (start_gw, end_gw)'''
 
         # get all data from fpl api
         data = requests.get(BASE_URL+'fixtures/').json()
@@ -281,20 +281,33 @@ class FplApiData:
             axis=1
         )
 
+        # filter within range (start_gw, end_gw)
+        if not start_gw:
+            start_gw = fixtures.GW.min()
+        if not end_gw:
+            end_gw = fixtures.GW.max()
+
+        fixtures = fixtures[(fixtures['GW'] >= start_gw) & (fixtures['GW'] <= end_gw)]
+
+        # team ids (index) vs opposition team ids (columns)
         home_team_ids = fixtures.pivot(
             index='team_h', columns='GW', values='team_a').fillna(0)
         away_team_ids = fixtures.pivot(
             index='team_a', columns='GW', values='team_h').fillna(0)
 
+        # team ids (index) vs fixture difficulty ratings (columns)
         home_ratings = fixtures.pivot(
             index='team_h', columns='GW', values='team_h_difficulty').fillna(0)
         away_ratings = fixtures.pivot(
             index='team_a', columns='GW', values='team_a_difficulty').fillna(0)
 
+        # team names (index) vs opposition team names (columns)
         home_team_names = fixtures.pivot(
-            index='team_home', columns='GW', values='team_away').fillna('')
+            index='team_home', columns='GW', values='team_away')
+        home_team_names = home_team_names.apply(lambda s: s + ' (H)' if s is not None else None).fillna('')
         away_team_names = fixtures.pivot(
-            index='team_away', columns='GW', values='team_home').fillna('')
+            index='team_away', columns='GW', values='team_home')
+        away_team_names = away_team_names.apply(lambda s: s + ' (A)' if s is not None else None).fillna('')
         
         fixture_ratings = home_ratings + away_ratings
         fixture_team_ids = home_team_ids + away_team_ids
