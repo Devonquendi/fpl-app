@@ -2,6 +2,7 @@ from typing import Mapping
 from unicodedata import name
 import pymongo
 import requests
+import config
 
 BASE_URL = 'https://fantasy.premierleague.com/api/'
 
@@ -15,8 +16,10 @@ players = api_data['elements']
 for p in players:
     p['_id'] = p.pop('id')
 
+
+
 # upload to mongodb client (replace <password> with actual password)
-client = pymongo.MongoClient('mongodb+srv://steinar:steinar@fpl-cluster.ygbi5gm.mongodb.net/?retryWrites=true&w=majority')
+client = pymongo.MongoClient('mongodb+srv://' + config.username + ':' + config.password + '@fpl-cluster.ygbi5gm.mongodb.net/?retryWrites=true&w=majority')
 
 db = client.get_database('raw')
 
