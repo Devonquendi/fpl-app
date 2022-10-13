@@ -1,12 +1,9 @@
+from typing import Mapping
+from unicodedata import name
 import pymongo
 import requests
 
-
 BASE_URL = 'https://fantasy.premierleague.com/api/'
-
-# db.positions.insert_many(api_data['element_types'])
-# db.teams.insert_many(api_data['teams'])
-
 
 # get data from api
 api_data = requests.get(BASE_URL+'bootstrap-static/').json()
@@ -19,8 +16,15 @@ for p in players:
     p['_id'] = p.pop('id')
 
 # upload to mongodb client (replace <password> with actual password)
-client = pymongo.MongoClient('mongodb+srv://steinar:<password>@fpl-cluster.ygbi5gm.mongodb.net/?retryWrites=true&w=majority')
-db = client.raw
+client = pymongo.MongoClient('mongodb+srv://steinar:steinar@fpl-cluster.ygbi5gm.mongodb.net/?retryWrites=true&w=majority')
 
-# ToDo: this doesn't work
-db.players.update_many(players, upsert=True)
+db = client.get_database('raw')
+
+#Update each player in mongodb players database
+for p in players:
+    player_id = p['_id']
+    db.players.replace_one(
+        filter = {'_id': player_id},
+        replacement = p,
+        upsert = True
+    )
