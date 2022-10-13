@@ -18,8 +18,8 @@ for p in players:
 
 
 
-# upload to mongodb client (replace <password> with actual password)
-client = pymongo.MongoClient('mongodb+srv://' + config.username + ':' + config.password + '@fpl-cluster.ygbi5gm.mongodb.net/?retryWrites=true&w=majority')
+# upload to mongodb client (You will need a config file with valid credentials)
+client = pymongo.MongoClient(f'mongodb+srv://{config.username}:{config.password}@fpl-cluster.ygbi5gm.mongodb.net/?retryWrites=true&w=majority')
 
 db = client.get_database('raw')
 
