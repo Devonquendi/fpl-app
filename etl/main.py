@@ -11,11 +11,14 @@ api_data = requests.get(BASE_URL+'bootstrap-static/').json()
 
 # extract player data
 players = api_data['elements']
+teams = api_data['teams']
 
 # rename id column to fit mongodb primary key requirements
 for p in players:
     p['_id'] = p.pop('id')
 
+for t in teams:
+    t['_id'] = t.pop('id')
 
 
 # upload to mongodb client (You will need a config file with valid credentials)
@@ -29,5 +32,14 @@ for p in players:
     db.players.replace_one(
         filter = {'_id': player_id},
         replacement = p,
+        upsert = True
+    )
+
+#Update each team in mongodb teams database
+for t in teams:
+    team_id = t['_id']
+    db.teams.replace_one(
+        filter = {'_id': team_id},
+        replacement = t,
         upsert = True
     )
