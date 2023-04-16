@@ -1,5 +1,7 @@
 import pandas as pd
-import os, requests, time
+import os
+import requests
+import time
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from tqdm.auto import tqdm
 
@@ -22,32 +24,32 @@ def get_player_history(player_id, type):
         except:
             # wait a bit to avoid API rate limits, if needed
             time.sleep(.3)
-    
+
     # extract 'history_past' data from response into dataframe
     df = pd.json_normalize(data[type])
 
     # season history needs player id column added
     if type == 'history_past':
         df.insert(0, 'id', player_id)
-    
+
     return df
 
 
 class FplApiData:
-    
+
     def __init__(self, team_id=None, gw=None):
         '''Downloads all relevant data from FPL API'''
-        
+
         # Bootstrap-static data
         api_data = requests.get(BASE_URL+'bootstrap-static/').json()
-        
+
         # player data
         self.players = pd.DataFrame(
             api_data['elements'])[
                 ['first_name', 'second_name', 'web_name', 'id', 'team',
                  'total_points', 'element_type', 'now_cost', 'points_per_game',
                  'minutes', 'goals_scored', 'assists', 'clean_sheets',
-                 'goals_conceded', 'own_goals', 'penalties_saved', 
+                 'goals_conceded', 'own_goals', 'penalties_saved',
                  'penalties_missed', 'yellow_cards', 'red_cards', 'saves',
                  'bonus','bps', 'influence', 'creativity', 'threat', 'ict_index']]
         self.players.rename(columns={'id':'player_id',
@@ -93,7 +95,7 @@ class FplApiData:
             # cash in the bank
             self.bank = manager_data['entry_history']['bank'] / 10
 
-    
+
     def make_opt_df(self, forecasts_file):
         '''Create dataframe with player info and upcoming projections'''
 
@@ -162,7 +164,7 @@ if __name__ == '__main__':
 
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
-    
+
     # load all data from API into memory
     api_data = FplApiData()
     # save all dataframes as CSVs in chosen folder
