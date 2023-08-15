@@ -1,9 +1,7 @@
 import altair as alt
 import numpy as np
-import pandas as pd
 import streamlit as st
-
-from load_data import FplApiData
+from fpl_data.api import FplApiData
 from st_helpers import display_frame
 
 
@@ -26,7 +24,7 @@ df = st.session_state['data'].df_total
 df_90 = st.session_state['data'].df_90
 df_gp = st.session_state['data'].df_gp
 
-# --------------------------------------------------------------------- side bar
+# -------------------------------------------------------------------- side bar
 position_select = st.sidebar.multiselect(
     'Position',
     df['pos'].unique()
@@ -55,7 +53,7 @@ if price_max:
     df_90 = df_90[price_filter]
     df_gp = df_gp[price_filter]
 
-# --------------------------------------------------------------- main container
+# -------------------------------------------------------------- main container
 # ---------------------------------------------------- dataframes
 st.header('Players summary')
 
