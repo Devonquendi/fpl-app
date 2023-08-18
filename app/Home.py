@@ -11,16 +11,20 @@ st.set_page_config(
 fpl_data = load_data()
 st.session_state['data'] = fpl_data
 
-df = st.session_state['data'].players_df.drop(
+players = st.session_state['data'].players_df.rename(
+    columns={'player_name': 'name'}
+)
+
+df = players.drop(
     ['Pts90', 'GS90', 'A90', 'GI90', 'xG90', 'xA90', 'xGI90', 'GC90', 'xGC90',
-     'S90', 'BPS90', 'II90'],
+     'S90', 'BPS90', 'II90', 'first_name', 'second_name'],
     axis=1
 ).sort_values(
     'Pts',
     ascending=False
 )
 
-df_90 = st.session_state['data'].players_df.drop(
+df_90 = players.drop(
     ['Pts', 'GS', 'A', 'GI', 'xG', 'xA', 'xGI', 'GC', 'xGC', 'BPS', 'II'],
     axis=1
 ).sort_values(
@@ -59,6 +63,7 @@ if price_max:
 # -------------------------------------------------------------- main container
 # ---------------------------------------------------- dataframes
 st.header('Players summary')
+st.write('Click on columns for sorting')
 
 st.subheader('Season totals')
 display_frame(df)
