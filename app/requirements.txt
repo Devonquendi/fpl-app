@@ -1,5 +1,6 @@
 matplotlib
 pandas
+jinja2
 requests
-seaborn
 streamlit
+FPL-data-loader

@@ -10,22 +10,19 @@ st.set_page_config(
 
 st.markdown('''
     #### To Do
-      * Use metric elements to show per game statistics compared to overall position average
-      * Weekly Pts chart
-      * Weekly ICT chart
-      * Nearest neighbours analysis to show "similar players"
-      * Add total points and cost to player select in sidebar
-      * Show player performance vs opposition strength ("fixture-proof" players)''')
+    * Use metric elements to show per game statistics compared to overall position average
+    * Weekly Pts chart
+    * Weekly ICT chart
+    * Nearest neighbours analysis to show "similar players"
+    * Add total points and cost to player select in sidebar
+    * Show player performance vs opposition strength ("fixture-proof" players)''')
 
 fpl_data = st.session_state['data']
-players = st.session_state['data'].players
-positions = st.session_state['data'].positions
-teams = st.session_state['data'].teams
-df = st.session_state['data'].df_total
-df_90 = st.session_state['data'].df_90
-df_gp = st.session_state['data'].df_gp
+df = st.session_state['data'].players_df
+positions = st.session_state['data'].positions_df
+teams = st.session_state['data'].teams_df
 
-# --------------------------------------------------------------------- side bar
+# -------------------------------------------------------------------- side bar
 # position slicer
 position_select = st.sidebar.multiselect(
     'Position',
@@ -52,12 +49,13 @@ player_select = st.sidebar.radio(
     'Player',
     df['name'].unique()
 )
-selected_player_id = df[df['name']==player_select].index.tolist()[0]
-player_history, player_history_past = fpl_data.get_player_summary(
-    selected_player_id)
+selected_player_id = df[df['name'] == player_select].index.tolist()[0]
+player_history = fpl_data.get_player_summary(selected_player_id)
+player_history_past = fpl_data.get_player_summary(
+    selected_player_id, type='history_past')
 
-# --------------------------------------------------------------- main container
-player_info = players.loc[selected_player_id].to_dict()
+# ---------------------------------------------------------------main container
+player_info = df.loc[selected_player_id].to_dict()
 player_name = player_info['first_name'] + ' ' + player_info['second_name']
 player_pos = player_info['pos_name_long']
 player_team = player_info['team_name_long']
