@@ -41,7 +41,7 @@ team_select = st.sidebar.multiselect(
 )
 price_max = st.sidebar.selectbox(
     'Max price',
-    np.arange(13.5, 3.5, -0.5)
+    np.arange(14.5, 3.5, -0.5)
 )
 if team_select:
     team_filter = df['team'].isin(team_select)
