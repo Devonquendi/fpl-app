@@ -1,5 +1,5 @@
-import altair as alt
 import numpy as np
+import plotly.express as px
 import streamlit as st
 from st_helpers import load_data, display_frame
 
@@ -72,6 +72,7 @@ with tab1:
 with tab2:
     st.subheader('Totals per 90 minutes')
     display_frame(df_90)
+
     # ------------------------------------------------- scatter plots
     scatter_x_select = st.selectbox(
         'X axis variable',
@@ -105,10 +106,14 @@ with tab2:
     scatter_y_var = scatter_y_lookup[scatter_y_select]
 
     st.subheader(f'{scatter_x_var} vs {scatter_y_var}')
-    c = alt.Chart(df_90).mark_circle(size=75).encode(
+
+    # create Plotly chart
+    fig = px.scatter(
+        data_frame=df_90,
         x=scatter_x_var,
         y=scatter_y_var,
         color='pos',
-        tooltip=['name', scatter_x_var, scatter_y_var]
+        size='£',
+        hover_data='name'
     )
-    st.altair_chart(c, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True)
