@@ -1,8 +1,7 @@
 import altair as alt
 import numpy as np
 import streamlit as st
-from fpl_data.api import FplApiData
-from st_helpers import display_frame
+from st_helpers import load_data, display_frame
 
 
 st.set_page_config(
@@ -16,13 +15,27 @@ st.markdown('''
       * Differential picks''')
 
 # load data from API
-with st.spinner():
-    fpl_data = FplApiData()
-    st.session_state['data'] = fpl_data
+fpl_data = load_data()
+st.session_state['data'] = fpl_data
 
-df = st.session_state['data'].df_total
-df_90 = st.session_state['data'].df_90
-df_gp = st.session_state['data'].df_gp
+df = st.session_state['data'].players_df.drop(
+    ['Pts90', 'GS90', 'A90', 'GI90', 'xG90', 'xA90', 'xGI90', 'GC90', 'xGC90',
+     'S90', 'BPS90', 'II90'],
+    axis=1
+).sort_values(
+    'Pts',
+    ascending=False
+)
+
+df_90 = st.session_state['data'].players_df.drop(
+    ['Pts', 'GS', 'A', 'GI', 'xG', 'xA', 'xGI', 'GC', 'xGC', 'BPS', 'II'],
+    axis=1
+).sort_values(
+    'Pts90',
+    ascending=False
+)
+# filter based on minutes played per game
+df_90 = df_90[df_90['MP'] > 20]
 
 # -------------------------------------------------------------------- side bar
 position_select = st.sidebar.multiselect(
@@ -41,17 +54,14 @@ if team_select:
     team_filter = df['team'].isin(team_select)
     df = df[team_filter]
     df_90 = df_90[team_filter]
-    df_gp = df_gp[team_filter]
 if position_select:
     pos_filter = df['pos'].isin(position_select)
     df = df[pos_filter]
     df_90 = df_90[pos_filter]
-    df_gp = df_gp[pos_filter]
 if price_max:
     price_filter = df['£'] <= price_max
     df = df[price_filter]
     df_90 = df_90[price_filter]
-    df_gp = df_gp[price_filter]
 
 # -------------------------------------------------------------- main container
 # ---------------------------------------------------- dataframes
@@ -59,9 +69,6 @@ st.header('Players summary')
 
 st.subheader('Season totals')
 display_frame(df)
-
-st.subheader('Totals per game played')
-display_frame(df_gp)
 
 st.subheader('Totals per 90 minutes')
 display_frame(df_90)
@@ -71,25 +78,15 @@ scatter_x_var = st.selectbox(
     ['ICT Index', 'Influence', 'Creativity', 'Threat']
 )
 scatter_lookup = {
-    'Influence': 'I', 'Creativity': 'C', 'Threat': 'T', 'ICT Index': 'II'
+    'Influence': 'I', 'Creativity': 'C', 'Threat': 'T', 'ICT Index': 'II90'
 }
 
-col1, col2 = st.columns(2)
-with col1:
-    st.header('Points per game played')
-    c = alt.Chart(df_gp).mark_circle(size=75).encode(
-        x=scatter_lookup[scatter_x_var],
-        y='Pts',
-        color='pos',
-        tooltip=['name', 'Pts']
-    )
-    st.altair_chart(c, use_container_width=True)
-with col2:
-    st.header('Points per 90')
-    c = alt.Chart(df_90).mark_circle(size=75).encode(
-        x=scatter_lookup[scatter_x_var],
-        y='Pts',
-        color='pos',
-        tooltip=['name', 'Pts']
-    )
-    st.altair_chart(c, use_container_width=True)
+
+st.header('Points per 90')
+c = alt.Chart(df_90).mark_circle(size=75).encode(
+    x=scatter_lookup[scatter_x_var],
+    y='Pts90',
+    color='pos',
+    tooltip=['name', 'Pts90']
+)
+st.altair_chart(c, use_container_width=True)
