@@ -1,5 +1,5 @@
-import altair as alt
 import numpy as np
+import plotly.express as px
 import streamlit as st
 from st_helpers import load_data, display_frame
 
@@ -11,16 +11,20 @@ st.set_page_config(
 fpl_data = load_data()
 st.session_state['data'] = fpl_data
 
-df = st.session_state['data'].players_df.drop(
+players = st.session_state['data'].players_df.rename(
+    columns={'player_name': 'name'}
+)
+
+df = players.drop(
     ['Pts90', 'GS90', 'A90', 'GI90', 'xG90', 'xA90', 'xGI90', 'GC90', 'xGC90',
-     'S90', 'BPS90', 'II90'],
+     'S90', 'BPS90', 'II90', 'first_name', 'second_name'],
     axis=1
 ).sort_values(
     'Pts',
     ascending=False
 )
 
-df_90 = st.session_state['data'].players_df.drop(
+df_90 = players.drop(
     ['Pts', 'GS', 'A', 'GI', 'xG', 'xA', 'xGI', 'GC', 'xGC', 'BPS', 'II'],
     axis=1
 ).sort_values(
@@ -41,7 +45,7 @@ team_select = st.sidebar.multiselect(
 )
 price_max = st.sidebar.selectbox(
     'Max price',
-    np.arange(13.5, 3.5, -0.5)
+    np.arange(14.5, 3.5, -0.5)
 )
 if team_select:
     team_filter = df['team'].isin(team_select)
@@ -59,40 +63,57 @@ if price_max:
 # -------------------------------------------------------------- main container
 # ---------------------------------------------------- dataframes
 st.header('Players summary')
+st.write('Click on columns for sorting')
 
-st.subheader('Season totals')
-display_frame(df)
+tab1, tab2 = st.tabs(['Season totals', 'Totals per 90 minutes'])
+with tab1:
+    st.subheader('Season totals')
+    display_frame(df)
+with tab2:
+    st.subheader('Totals per 90 minutes')
+    display_frame(df_90)
 
-st.subheader('Totals per 90 minutes')
-display_frame(df_90)
-# ------------------------------------------------- scatter plots
-scatter_x_var = st.selectbox(
-    'X axis variable',
-    ['ICT Index', 'Influence', 'Creativity', 'Threat']
-)
-scatter_lookup = {
-    'Influence': 'I90',
-    'Creativity': 'C90',
-    'Threat': 'T90',
-    'ICT Index': 'II90'
-}
-
-col1, col2 = st.columns(2)
-with col1:
-    st.header('Points per 90')
-    c = alt.Chart(df_90).mark_circle(size=75).encode(
-        x=scatter_lookup[scatter_x_var],
-        y='Pts90',
-        color='pos',
-        tooltip=['name', scatter_lookup[scatter_x_var], 'Pts90']
+    # ------------------------------------------------- scatter plots
+    scatter_x_select = st.selectbox(
+        'X axis variable',
+        ['xG', 'xA', 'xGI', 'ICT Index', 'Influence', 'Creativity', 'Threat']
     )
-    st.altair_chart(c, use_container_width=True)
-with col2:
-    st.header('xGI per 90')
-    c = alt.Chart(df_90).mark_circle(size=75).encode(
-        x=scatter_lookup[scatter_x_var],
-        y='xGI90',
-        color='pos',
-        tooltip=['name', scatter_lookup[scatter_x_var], 'xGI90']
+    scatter_x_lookup = {
+        'xG': 'xG90',
+        'xA': 'xA90',
+        'xGI': 'xGI90',
+        'Influence': 'I90',
+        'Creativity': 'C90',
+        'Threat': 'T90',
+        'ICT Index': 'II90'
+    }
+
+    scatter_y_select = st.selectbox(
+        'Y axis variable',
+        ['GS', 'xG', 'A', 'xA', 'GI', 'xGI']
     )
-    st.altair_chart(c, use_container_width=True)
+
+    scatter_y_lookup = {
+        'GS': 'GS90',
+        'xG': 'xG90',
+        'A': 'A90',
+        'xA': 'xA90',
+        'GI': 'GI90',
+        'xGI': 'xGI90'
+    }
+
+    scatter_x_var = scatter_x_lookup[scatter_x_select]
+    scatter_y_var = scatter_y_lookup[scatter_y_select]
+
+    st.subheader(f'{scatter_x_var} vs {scatter_y_var}')
+
+    # create Plotly chart
+    fig = px.scatter(
+        data_frame=df_90,
+        x=scatter_x_var,
+        y=scatter_y_var,
+        color='pos',
+        size='£',
+        hover_data='name'
+    )
+    st.plotly_chart(fig, use_container_width=True)
