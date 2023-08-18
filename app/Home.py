@@ -65,39 +65,50 @@ if price_max:
 st.header('Players summary')
 st.write('Click on columns for sorting')
 
-st.subheader('Season totals')
-display_frame(df)
-
-st.subheader('Totals per 90 minutes')
-display_frame(df_90)
-# ------------------------------------------------- scatter plots
-scatter_x_var = st.selectbox(
-    'X axis variable',
-    ['ICT Index', 'Influence', 'Creativity', 'Threat']
-)
-scatter_lookup = {
-    'Influence': 'I90',
-    'Creativity': 'C90',
-    'Threat': 'T90',
-    'ICT Index': 'II90'
-}
-
-col1, col2 = st.columns(2)
-with col1:
-    st.header('Points per 90')
-    c = alt.Chart(df_90).mark_circle(size=75).encode(
-        x=scatter_lookup[scatter_x_var],
-        y='Pts90',
-        color='pos',
-        tooltip=['name', scatter_lookup[scatter_x_var], 'Pts90']
+tab1, tab2 = st.tabs(['Season totals', 'Totals per 90 minutes'])
+with tab1:
+    st.subheader('Season totals')
+    display_frame(df)
+with tab2:
+    st.subheader('Totals per 90 minutes')
+    display_frame(df_90)
+    # ------------------------------------------------- scatter plots
+    scatter_x_select = st.selectbox(
+        'X axis variable',
+        ['xG', 'xA', 'xGI', 'ICT Index', 'Influence', 'Creativity', 'Threat']
     )
-    st.altair_chart(c, use_container_width=True)
-with col2:
-    st.header('xGI per 90')
+    scatter_x_lookup = {
+        'xG': 'xG90',
+        'xA': 'xA90',
+        'xGI': 'xGI90',
+        'Influence': 'I90',
+        'Creativity': 'C90',
+        'Threat': 'T90',
+        'ICT Index': 'II90'
+    }
+
+    scatter_y_select = st.selectbox(
+        'Y axis variable',
+        ['GS', 'xG', 'A', 'xA', 'GI', 'xGI']
+    )
+
+    scatter_y_lookup = {
+        'GS': 'GS90',
+        'xG': 'xG90',
+        'A': 'A90',
+        'xA': 'xA90',
+        'GI': 'GI90',
+        'xGI': 'xGI90'
+    }
+
+    scatter_x_var = scatter_x_lookup[scatter_x_select]
+    scatter_y_var = scatter_y_lookup[scatter_y_select]
+
+    st.subheader(f'{scatter_x_var} vs {scatter_y_var}')
     c = alt.Chart(df_90).mark_circle(size=75).encode(
-        x=scatter_lookup[scatter_x_var],
-        y='xGI90',
+        x=scatter_x_var,
+        y=scatter_y_var,
         color='pos',
-        tooltip=['name', scatter_lookup[scatter_x_var], 'xGI90']
+        tooltip=['name', scatter_x_var, scatter_y_var]
     )
     st.altair_chart(c, use_container_width=True)
