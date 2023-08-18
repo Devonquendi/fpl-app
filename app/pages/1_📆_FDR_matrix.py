@@ -3,7 +3,7 @@ from st_helpers import style_background_team_fdr
 
 
 st.set_page_config(
-    page_title='FPL Team Fixtures', page_icon='📆', layout='wide')
+    page_title='FDR Matrix', page_icon='📆', layout='wide')
 
 fpl_data = st.session_state['data']
 gameweeks = st.session_state['data'].gameweeks_df
