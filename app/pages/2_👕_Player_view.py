@@ -9,7 +9,8 @@ st.set_page_config(
 fpl_data = st.session_state['data']
 gameweeks = st.session_state['data'].gameweeks_df
 teams = st.session_state['data'].teams_df
-players = st.session_state['data'].players_df
+players = st.session_state['data'].players_df.sort_values(
+    'Pts', ascending=False)
 
 # -------------------------------------------------------------------- side bar
 # position slicer
@@ -36,7 +37,7 @@ if price_max:
 # player selector
 player_select = st.sidebar.radio(
     'Player',
-    players['player_name'].unique()
+    players['player_name'].values
 )
 selected_player_id = players[
     players['player_name'] == player_select].index.tolist()[0]
@@ -50,25 +51,23 @@ player_name = player_info['first_name'] + ' ' + player_info['second_name']
 player_pos = player_info['pos']
 player_team = player_info['team']
 
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.header(player_name)
-with col2:
-    st.header(player_pos)
-with col3:
-    st.header(player_team)
+st.header(player_name)
+st.subheader(f'{player_pos} - {player_team}')
 
-st.header('Player summary')
 # ------------------------------------ metrics
 st.subheader('Season totals')
 player_totals = players.loc[selected_player_id].to_dict()
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4, col5 = st.columns(5)
 with col1:
-    st.metric(label='Points scored', value=player_totals['Pts'])
-with col2:
     st.metric(label='Price', value=f"£{player_totals['£']}")
+with col2:
+    st.metric(label='PPG', value=player_totals['PPG'])
 with col3:
+    st.metric(label='xGI90', value=player_totals['xGI90'])
+with col4:
+    st.metric(label='xGC90', value=player_totals['xGC90'])
+with col5:
     st.metric(label='TSB', value=f"{player_totals['TSB%']}%")
 
 
