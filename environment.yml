@@ -1,7 +1,4 @@
 name: fpl-app
-channels:
-  - conda-forge
-  - defaults
 dependencies:
   - python=3.9
   - ipython==8.13.2
