@@ -7,13 +7,6 @@ from st_helpers import load_data, display_frame
 st.set_page_config(
     page_title='FPL dashboard', page_icon='⚽', layout='wide')
 
-st.markdown('''
-    #### To Do
-      * Scrape data from FBRef and Understat
-      * Player points predictions
-      * Upcoming fixture difficulties (who has easy/hard schedules?)
-      * Differential picks''')
-
 # load data from API
 fpl_data = load_data()
 st.session_state['data'] = fpl_data
@@ -78,15 +71,28 @@ scatter_x_var = st.selectbox(
     ['ICT Index', 'Influence', 'Creativity', 'Threat']
 )
 scatter_lookup = {
-    'Influence': 'I', 'Creativity': 'C', 'Threat': 'T', 'ICT Index': 'II90'
+    'Influence': 'I90',
+    'Creativity': 'C90',
+    'Threat': 'T90',
+    'ICT Index': 'II90'
 }
 
-
-st.header('Points per 90')
-c = alt.Chart(df_90).mark_circle(size=75).encode(
-    x=scatter_lookup[scatter_x_var],
-    y='Pts90',
-    color='pos',
-    tooltip=['name', 'Pts90']
-)
-st.altair_chart(c, use_container_width=True)
+col1, col2 = st.columns(2)
+with col1:
+    st.header('Points per 90')
+    c = alt.Chart(df_90).mark_circle(size=75).encode(
+        x=scatter_lookup[scatter_x_var],
+        y='Pts90',
+        color='pos',
+        tooltip=['name', scatter_lookup[scatter_x_var], 'Pts90']
+    )
+    st.altair_chart(c, use_container_width=True)
+with col2:
+    st.header('xGI per 90')
+    c = alt.Chart(df_90).mark_circle(size=75).encode(
+        x=scatter_lookup[scatter_x_var],
+        y='xGI90',
+        color='pos',
+        tooltip=['name', scatter_lookup[scatter_x_var], 'xGI90']
+    )
+    st.altair_chart(c, use_container_width=True)
