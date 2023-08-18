@@ -31,6 +31,5 @@ fixtures = fpl_data.get_fixtures_matrix(
 st.subheader('Fixtures')
 st.dataframe(
     fixtures.style.applymap(style_background_team_fdr),
-    height=800,
     use_container_width=True
 )
