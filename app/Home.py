@@ -7,13 +7,6 @@ from st_helpers import load_data, display_frame
 st.set_page_config(
     page_title='FPL dashboard', page_icon='⚽', layout='wide')
 
-st.markdown('''
-    #### To Do
-      * Scrape data from FBRef and Understat
-      * Player points predictions
-      * Upcoming fixture difficulties (who has easy/hard schedules?)
-      * Differential picks''')
-
 # load data from API
 fpl_data = load_data()
 st.session_state['data'] = fpl_data
