@@ -3,4 +3,4 @@ pandas
 jinja2
 requests
 streamlit
-FPL-data-loader
+FPL-data-loader>=0.0.9
