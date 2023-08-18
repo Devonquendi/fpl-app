@@ -80,6 +80,10 @@ player_fixtures = fpl_data.get_player_summary(
 
 st.subheader('Gameweek history')
 display_frame(player_history)
+
+st.line_chart(player_history[['xGI', 'GS', 'A']])
+
+# ------------------------------------ upcoming fixtures
 st.subheader('Upcoming fixtures')
 st.dataframe(
     player_fixtures.T.style.applymap(style_background_player_fdr),
