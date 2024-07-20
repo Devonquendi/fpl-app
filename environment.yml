@@ -6,4 +6,4 @@ dependencies:
   - streamlit>=1.36.0
   - pip>=24.0
   - pip:
-    - FPL-data-loader>=0.1.0
+    - FPL-data-loader==0.1.1
