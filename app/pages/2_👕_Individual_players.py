@@ -1,6 +1,6 @@
 import numpy as np
 import streamlit as st
-from st_helpers import load_data, style_background_player_fdr
+from st_helpers import load_data, style_background_player_fdr, donate_message
 
 
 st.set_page_config(
@@ -84,7 +84,4 @@ st.dataframe(
     use_container_width=True
 )
 
-st.markdown(
-    '> If you like this work and want to support me, '
-    '[Buy Me a Coffee ☕ ](https://www.buymeacoffee.com/jamesbleslie)'
-)
+donate_message()
