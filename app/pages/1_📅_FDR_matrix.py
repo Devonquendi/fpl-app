@@ -29,9 +29,18 @@ fixtures = fpl_data.get_fixtures_matrix(
     start_gw, end_gw - start_gw)
 
 # -------------------------------------------------------------- main container
-st.subheader('Fixtures')
+st.header('Fixtures')
+st.write(
+    'Rows are sorted in ascending order of FDR, i.e. least difficult schedules'
+    ' at the top.'
+)
+
 st.dataframe(
     fixtures.style.map(style_background_team_fdr),
     height=750,
     use_container_width=True
+)
+st.markdown(
+    '> If you like this work and want to support me, '
+    '[Buy Me a Coffee ☕ ](https://www.buymeacoffee.com/jamesbleslie)'
 )

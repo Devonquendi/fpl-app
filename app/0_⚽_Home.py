@@ -61,12 +61,18 @@ if price_max:
 # -------------------------------------------------------------- main container
 # ---------------------------------------------------- dataframes
 st.header('Players summary')
-st.write('Click on columns for sorting')
 
 tab1, tab2 = st.tabs(['Season totals', 'Totals per 90 minutes'])
 with tab1:
     st.subheader('Season totals')
+    st.write('Click on columns for sorting')
     display_frame(df)
 with tab2:
     st.subheader('Totals per 90 minutes')
+    st.write('Click on columns for sorting')
     display_frame(df_90)
+
+st.markdown(
+    '> If you like this work and want to support me, '
+    '[Buy Me a Coffee ☕ ](https://www.buymeacoffee.com/jamesbleslie)'
+)

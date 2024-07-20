@@ -83,3 +83,8 @@ st.dataframe(
     player_fixtures.T.style.map(style_background_player_fdr),
     use_container_width=True
 )
+
+st.markdown(
+    '> If you like this work and want to support me, '
+    '[Buy Me a Coffee ☕ ](https://www.buymeacoffee.com/jamesbleslie)'
+)
