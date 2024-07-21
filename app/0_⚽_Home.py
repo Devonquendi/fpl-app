@@ -11,7 +11,7 @@ players = fpl_data.players_df
 
 st.title('FPL Dashboard')
 
-st.write('This is some placeholder text description of the FPL Dashboard')
+st.write('The FPL Dashboard is a collection of visualizations and insights using the Fantasy Premier League API data.')
 
 fig = px.scatter(
     players,
