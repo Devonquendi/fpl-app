@@ -1,5 +1,5 @@
 import streamlit as st
-from st_helpers import load_data
+from st_helpers import load_data, donate_message
 import plotly.express as px
 
 st.set_page_config(
@@ -24,3 +24,5 @@ fig = px.scatter(
 )
 
 st.plotly_chart(fig, theme="streamlit", use_container_width=True)
+
+donate_message()
