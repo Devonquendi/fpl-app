@@ -1,10 +1,12 @@
 import numpy as np
 import plotly.express as px
 import streamlit as st
-from utils import load_data, display_frame, donate_message
+from utils import load_data, donate_message
+from styles import style_players
 
 
-st.set_page_config(page_title='FPL dashboard', page_icon='⚽', layout='wide')
+st.set_page_config(
+    page_title='FPLstat: All players', page_icon='🧑‍🤝‍🧑', layout='wide')
 
 st.title('All Players')
 
@@ -67,11 +69,37 @@ tab1, tab2 = st.tabs(['Season totals', 'Totals per 90 minutes'])
 with tab1:
     st.subheader('Season totals')
     st.write('Click on columns for sorting')
-    display_frame(df)
+    st.dataframe(
+        df.sort_values('Pts', ascending=False),
+        column_order=[key for key in style_players.keys()],
+        column_config=style_players
+    )
 with tab2:
+    # convert all stats to per 90 minutes
+    df_90 = df.assign(
+        Pts=lambda x: x.Pts / x.MP * 90,
+        GS=lambda x: x.GS / x.MP * 90,
+        A=lambda x: x.A / x.MP * 90,
+        GI=lambda x: (x.GS + x.A) / x.MP * 90,
+        B=lambda x: x.B / x.MP * 90,
+        BPS=lambda x: x.BPS / x.MP * 90
+    ).query(
+        # filter out players who have played less than 30 minutes
+        'MP > 30'
+    ).sort_values(
+        'Pts',
+        ascending=False
+    )
+
+    float_cols = df_90.select_dtypes(include='float64').columns.values
+
     st.subheader('Totals per 90 minutes')
     st.write('Click on columns for sorting')
-    display_frame(df_90)
+    st.dataframe(
+        df_90.style.format(subset=float_cols, formatter='{:.1f}'),
+        column_order=[key for key in style_players.keys()],
+        column_config=style_players
+    )
 
 
 fig = px.scatter(
