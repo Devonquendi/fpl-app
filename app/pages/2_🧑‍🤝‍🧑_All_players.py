@@ -1,6 +1,8 @@
 import numpy as np
+import plotly.express as px
 import streamlit as st
-from st_helpers import load_data, display_frame, donate_message
+from utils import load_data, display_frame, donate_message
+
 
 st.set_page_config(page_title='FPL dashboard', page_icon='⚽', layout='wide')
 
@@ -9,11 +11,8 @@ st.title('All Players')
 # load data from API
 fpl_data = load_data()
 
-players = fpl_data.players_df.rename(
-    columns={'player_name': 'name'}
-)
-
-df = players.drop(
+# season totals
+df = fpl_data.players_df.drop(
     ['Pts90', 'GS90', 'A90', 'GI90', 'xG90', 'xA90', 'xGI90', 'GC90', 'xGC90',
      'S90', 'BPS90', 'II90', 'first_name', 'second_name'],
     axis=1
@@ -22,8 +21,10 @@ df = players.drop(
     ascending=False
 )
 
-df_90 = players.drop(
-    ['Pts', 'GS', 'A', 'GI', 'xG', 'xA', 'xGI', 'GC', 'xGC', 'BPS', 'II'],
+# stats per 90 minutes
+df_90 = fpl_data.players_df.drop(
+    ['Pts', 'GS', 'A', 'GI', 'xG', 'xA', 'xGI', 'GC', 'xGC', 'BPS', 'II',
+     'first_name', 'second_name'],
     axis=1
 ).sort_values(
     'Pts90',
@@ -71,5 +72,19 @@ with tab2:
     st.subheader('Totals per 90 minutes')
     st.write('Click on columns for sorting')
     display_frame(df_90)
+
+
+fig = px.scatter(
+    df,
+    x="xGI",
+    y="GI",
+    size="£",
+    color="pos",
+    hover_name="player_name",
+    trendline="ols",
+    title='xGI vs GI'
+)
+
+st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
 donate_message()

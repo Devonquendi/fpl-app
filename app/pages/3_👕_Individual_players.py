@@ -1,6 +1,7 @@
 import numpy as np
 import streamlit as st
-from st_helpers import load_data, style_background_player_fdr, donate_message
+from utils import load_data, donate_message
+from styles import style_background_player_fdr
 
 
 st.set_page_config(
