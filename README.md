@@ -15,5 +15,5 @@ conda activate fpl-app
 
 ### 1. Navigate to **`app`** folder and start streamlit app:
 ```bash
-streamlit run Home.py
+streamlit run app/0_⚽_Home.py
 ```

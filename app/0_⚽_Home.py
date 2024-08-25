@@ -1,0 +1,28 @@
+import streamlit as st
+from st_helpers import load_data, donate_message
+import plotly.express as px
+
+st.set_page_config(
+    page_title='FPL dashboard', page_icon='⚽', layout='wide')
+
+fpl_data = load_data()
+
+players = fpl_data.players_df
+
+st.title('FPL Dashboard')
+
+st.write('The FPL Dashboard is a collection of visualizations and insights using the Fantasy Premier League API data.')
+
+fig = px.scatter(
+    players,
+    x="GI",
+    y="xGI",
+    size="£",
+    color="pos",
+    hover_name="player_name",
+    trendline="ols"
+)
+
+st.plotly_chart(fig, theme="streamlit", use_container_width=True)
+
+donate_message()
