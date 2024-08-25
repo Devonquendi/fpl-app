@@ -4,7 +4,7 @@ from styles import style_background_team_fdr
 
 
 st.set_page_config(
-    page_title='FDR Matrix', page_icon='📆', layout='wide')
+    page_title='FPLstat: FDR Matrix', page_icon='📆', layout='wide')
 
 # load data from API
 fpl_data = load_data()

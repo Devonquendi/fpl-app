@@ -21,15 +21,15 @@ def donate_message():
     html_content = """
     <div style="display: flex; align-items: center; gap: 10px;">
         <span>If you like this work and want to support me</span>
-        <a 
-            href="https://www.buymeacoffee.com/jamesbleslie" 
-            target="_blank" 
+        <a
+            href="https://www.buymeacoffee.com/jamesbleslie"
+            target="_blank"
             style="
-                background-color: #FFDD00; 
-                color: black; 
-                padding: 10px 20px; 
-                text-decoration: none; 
-                font-weight: bold; 
+                background-color: #FFDD00;
+                color: black;
+                padding: 10px 20px;
+                text-decoration: none;
+                font-weight: bold;
                 border-radius: 5px;
             "
         >
