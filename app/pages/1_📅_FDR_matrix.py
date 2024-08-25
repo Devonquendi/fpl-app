@@ -1,5 +1,6 @@
 import streamlit as st
-from st_helpers import load_data, style_background_team_fdr, donate_message
+from utils import load_data, donate_message
+from styles import style_background_team_fdr
 
 
 st.set_page_config(
@@ -31,7 +32,7 @@ fixtures = fpl_data.get_fixtures_matrix(
 # -------------------------------------------------------------- main container
 st.header('Fixtures')
 st.write(
-    'Rows are sorted in ascending order of FDR, i.e. least difficult schedules'
+    'Rows are sorted in ascending order of FDR - least difficult schedules'
     ' at the top.'
 )
 
