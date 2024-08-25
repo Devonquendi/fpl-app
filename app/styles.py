@@ -1,3 +1,6 @@
+import streamlit as st
+
+
 def style_background_team_fdr(cell_value):
     '''Used to apply background highlighting to the teams FDR matrix'''
 
@@ -38,3 +41,81 @@ def style_background_player_fdr(cell_value):
         return f'{bg} #80072d; color: #ffffff;'
     else:
         return ''
+
+
+style_players = {
+    'pos': st.column_config.TextColumn(
+        'Pos',
+        help='Position'
+    ),
+    'player_name': st.column_config.TextColumn(
+        'Player'
+    ),
+    'team': st.column_config.TextColumn(
+        'Team'
+    ),
+    '£': st.column_config.NumberColumn(
+        '£',
+        help='Current price'
+    ),
+    'ST': st.column_config.NumberColumn(
+        'ST',
+        help='Games started'
+    ),
+    'MP': st.column_config.NumberColumn(
+        'MP',
+        help='Minutes played'
+    ),
+    'PPG': st.column_config.NumberColumn(
+        'PPG',
+        help='Points per game'
+    ),
+    'Pts': st.column_config.NumberColumn(
+        'Pts',
+        help='Points scored'
+    ),
+    'GS': st.column_config.NumberColumn(
+        'GS',
+        help='Goals'
+    ),
+    'A': st.column_config.NumberColumn(
+        'A',
+        help='Assists'
+    ),
+    'GI': st.column_config.NumberColumn(
+        'GI',
+        help='Goal involvements (G + A)'
+    ),
+    'xG': st.column_config.NumberColumn(
+        'xG',
+        help='Expected goals'
+    ),
+    'xA': st.column_config.NumberColumn(
+        'xA',
+        help='Expected assists'
+    ),
+    'xGI': st.column_config.NumberColumn(
+        'xGI',
+        help='Expected goal involvements (xG + xA)'
+    ),
+    'CS': st.column_config.NumberColumn(
+        'CS',
+        help='Clean sheets'
+    ),
+    'GC': st.column_config.NumberColumn(
+        'GC',
+        help='Goals conceded'
+    ),
+    'xGC': st.column_config.NumberColumn(
+        'xGC',
+        help='Expected goals conceded'
+    ),
+    'B': st.column_config.NumberColumn(
+        'B',
+        help='Bonus points'
+    ),
+    'BPS': st.column_config.NumberColumn(
+        'BPS',
+        help='Bonus points score'
+    ),
+}
