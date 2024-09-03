@@ -2,10 +2,10 @@ name: fpl-app
 channels:
   - conda-forge
 dependencies:
-  - python=3.11
-  - streamlit>=1.36.0
-  - statsmodels
-  - plotly:plotly==5.22.0
+  - python>=3.11
+  - streamlit>=1.38.0
+  - statsmodels>=0.14.2
+  - plotly:plotly>=5.22.0
   - pip>=24.0
   - pip:
-    - FPL-data-loader==0.1.1
+    - FPL-data-loader==0.2.0
