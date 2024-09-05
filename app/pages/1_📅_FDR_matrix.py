@@ -1,9 +1,10 @@
 import streamlit as st
-from st_helpers import load_data, style_background_team_fdr
+from utils import load_data, donate_message
+from styles import style_background_team_fdr
 
 
 st.set_page_config(
-    page_title='FDR Matrix', page_icon='📆', layout='wide')
+    page_title='FPLstat: FDR Matrix', page_icon='📆', layout='wide')
 
 # load data from API
 fpl_data = load_data()
@@ -31,7 +32,7 @@ fixtures = fpl_data.get_fixtures_matrix(
 # -------------------------------------------------------------- main container
 st.header('Fixtures')
 st.write(
-    'Rows are sorted in ascending order of FDR, i.e. least difficult schedules'
+    'Rows are sorted in ascending order of FDR - least difficult schedules'
     ' at the top.'
 )
 
@@ -40,7 +41,4 @@ st.dataframe(
     height=750,
     use_container_width=True
 )
-st.markdown(
-    '> If you like this work and want to support me, '
-    '[Buy Me a Coffee ☕ ](https://www.buymeacoffee.com/jamesbleslie)'
-)
+donate_message()
