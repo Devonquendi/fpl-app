@@ -15,7 +15,8 @@ st.markdown(
 * Optimal rotating pairs of players / teams for upcoming weeks
 * Player time series chart showing GI vs xGI per gameweek
 
-## 🤙 Contact
-If you have any feedback or suggestions, feel free to send me an email at 
-contactjamesleslie@gmail.com"""
+## 🤙 Feedback
+I would love to hear any ideas you may have for improving this tool.
+
+Please submit your feedback using [this form](https://forms.gle/z6kLrbZ6mfRnZ5sc8) """
 )
