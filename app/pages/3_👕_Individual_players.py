@@ -31,11 +31,11 @@ if price_max:
 player_select = st.sidebar.radio("Player", players["player_name"].values)
 selected_player_id = players[players["player_name"] == player_select].index.tolist()[0]
 
-player_history = fpl_data.get_player_summary(selected_player_id, type="history")
+df = fpl_data.get_player_summary(selected_player_id, type="history")
 
-player_history_past = fpl_data.get_player_summary(
-    selected_player_id, type="history_past"
-)
+df_past = fpl_data.get_player_summary(selected_player_id, type="history_past")
+df["GI"] = df["GS"] + df["A"]
+df["GI delta"] = df["GI"] - df["xGI"]
 
 # ---------------------------------------------------------------main container
 player_info = players.loc[selected_player_id].to_dict()
@@ -62,31 +62,35 @@ with col4:
 with col5:
     st.metric(label="TSB", value=f"{player_totals['TSB%']}%")
 
-# ------------------------------------ past performance
-st.subheader("Past performance")
-st.dataframe(player_history.sort_index(ascending=False), use_container_width=True)
-
-# plot cummulative xGI
-fig = px.line(
-    player_history[["xG", "GS"]].cumsum(),
-    range_y=[0, player_history[["xG", "GS"]].cumsum().max().max() + 1],
-)
-st.plotly_chart(fig)
-
-fig = px.line(
-    player_history,
-    y=["xG", "GS"],
-    range_y=[0, player_history[["xG", "GS"]].max().max() + 1],
-)
-st.plotly_chart(fig)
-
 # ------------------------------------ upcoming fixtures
 st.subheader("Upcoming fixtures")
 
 player_fixtures = fpl_data.get_player_summary(selected_player_id, "fixtures")
-
 st.dataframe(
     player_fixtures.T.style.map(style_background_player_fdr), use_container_width=True
 )
+
+# ------------------------------------ past performance
+st.subheader("Past performance")
+st.dataframe(df.sort_index(ascending=False), use_container_width=True)
+
+fig = px.bar(
+    df,
+    y="GI delta",
+    color="GI delta",
+    color_continuous_scale="RdYlGn",
+    color_continuous_midpoint=0,
+    title="GI - xGI delta (positive numbers = 'overperforming')",
+)
+# fig.update_traces(marker_color=df["colour"])
+st.plotly_chart(fig)
+
+
+# plot cummulative xGI
+fig = px.line(
+    df[["xGI", "GI"]].cumsum(),
+    title="Cummulative xGI and GI over time",
+)
+st.plotly_chart(fig)
 
 donate_message()
