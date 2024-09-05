@@ -10,9 +10,12 @@ st.write(
 )
 
 st.markdown(
-    """# Roadmap
+    """## 🛣️ Roadmap
 * Include option to change FDR matrix to attack / defensive difficulty
 * Optimal rotating pairs of players / teams for upcoming weeks
 * Player time series chart showing GI vs xGI per gameweek
-"""
+
+## 🤙 Contact
+If you have any feedback or suggestions, feel free to send me an email at 
+contactjamesleslie@gmail.com"""
 )
