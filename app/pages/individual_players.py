@@ -14,21 +14,24 @@ gameweeks = fpl_data.gameweeks_df
 teams = fpl_data.teams_df
 players = fpl_data.players_df.sort_values("Pts", ascending=False)
 
-# -------------------------------------------------------------------- side bar
-# position slicer
-position_select = st.sidebar.multiselect("Position", players["pos"].unique())
-if position_select:
-    players = players[players["pos"].isin(position_select)]
+# -------------------------------------------------------------------- player search
+# Create a four-column layout
+col1, col2, col3, col4 = st.columns(4)
+
 # team slicer
-team_select = st.sidebar.multiselect("Team", players["team"].unique())
+team_select = col1.multiselect("Team", players["team"].unique())
 if team_select:
     players = players[players["team"].isin(team_select)]
+# position slicer
+position_select = col2.multiselect("Position", players["pos"].unique())
+if position_select:
+    players = players[players["pos"].isin(position_select)]
 # price slicer
-price_max = st.sidebar.selectbox("Max price", np.arange(14.5, 3.5, -0.5))
+price_max = col3.selectbox("Max price", np.arange(14.5, 3.5, -0.5))
 if price_max:
     players = players[players["£"] <= price_max]
 # player selector
-player_select = st.sidebar.radio("Player", players["player_name"].values)
+player_select = col4.selectbox("Player", players["player_name"].values)
 selected_player_id = players[players["player_name"] == player_select].index.tolist()[0]
 
 df = fpl_data.get_player_summary(selected_player_id, type="history")
