@@ -1,19 +1,9 @@
-# FPL Streamlit app
-Data-driven decision making tool for [Fantasy Premier League](https://fantasy.premierleague.com/)
+# FPL Streamlit app (moved)
 
-## List of useful links:
-  * [Streamlit - Get Started](https://docs.streamlit.io/library/get-started)
-  * [Cheatsheet of all current FPL endpoints](https://www.reddit.com/r/FantasyPL/comments/f8t3bw/cheatsheet_of_all_current_fpl_endpoints/)
+This project has moved to **[fplstat.app](https://fplstat.app)** and is now developed in the `fplstat` repo.
 
-## Getting started
+This repository only contains a small Streamlit stub that links to the new site.
 
-### 0. Create virtual environment and activate it:
 ```bash
-conda env create -f environment.yml
-conda activate fpl-app
-```
-
-### 1. Navigate to **`app`** folder and start streamlit app:
-```bash
-streamlit run app/0_⚽_Home.py
+uv run streamlit run "app/0_⚽_Home.py"
 ```
