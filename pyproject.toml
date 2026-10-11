@@ -1,12 +1,9 @@
 [project]
 name = "fpl-app"
 version = "0.1.0"
-description = "Add your description here"
+description = "Stub pointing to fplstat.app"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "fpl-data-loader>=0.2.0",
-    "plotly>=5.24.1",
-    "statsmodels>=0.14.4",
     "streamlit>=1.41.1",
 ]
